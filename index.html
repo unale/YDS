@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#EEF1F6">
+<title>Kelime Defteri — YDS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1C2B4B; --ink-soft:#4A5878; --ink-faint:#8B94AB;
+  --paper:#EEF1F6; --card:#FFFFFF;
+  --marker:#FFD449; --marker-soft:#FFF3C4;
+  --green:#2E7D5B; --green-soft:#E3F1EA;
+  --red:#C4453C; --red-soft:#F9E7E5;
+  --blue:#3557B7; --blue-soft:#E7EDFB;
+  --line:#DDE2EC;
+  --radius:16px;
+  --shadow:0 2px 8px rgba(28,43,75,.08),0 8px 24px rgba(28,43,75,.06);
+}
+html[data-theme="dark"]{
+  --ink:#E8ECF5; --ink-soft:#A9B2C8; --ink-faint:#6C7690;
+  --paper:#141926; --card:#1E2536;
+  --marker:#E5BE3D; --marker-soft:#3A3420;
+  --green:#5BBF94; --green-soft:#1E3A2F;
+  --red:#E0756C; --red-soft:#3E2422;
+  --blue:#7C9BEF; --blue-soft:#232F4E;
+  --line:#2C3550;
+  --shadow:0 2px 8px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px}
+body{font-family:'Public Sans',system-ui,sans-serif;background:var(--paper);color:var(--ink);min-height:100dvh;padding-bottom:calc(72px + env(safe-area-inset-bottom));transition:background .2s}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+input,select,textarea{font-family:inherit;font-size:1rem;color:var(--ink)}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 20px 14px;max-width:560px;margin:0 auto}
+.brand{font-family:'Source Serif 4',serif;font-weight:700;font-size:1.2rem;letter-spacing:-.01em}
+.brand .hl{position:relative;display:inline-block;padding:0 4px}
+.hl::before{content:"";position:absolute;inset:38% -2px 6% -2px;background:var(--marker);z-index:-1;transform:skewX(-8deg) rotate(-1deg);border-radius:3px}
+html[data-theme="dark"] .hl::before{opacity:.85}
+.profile-switch{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px}
+.profile-switch button{padding:6px 14px;border-radius:999px;font-weight:600;font-size:.85rem;color:var(--ink-soft);transition:background .15s,color .15s}
+.profile-switch button.active{background:var(--ink);color:var(--paper)}
+
+main{max-width:560px;margin:0 auto;padding:4px 20px 24px}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+h2.section-title{font-family:'Source Serif 4',serif;font-size:1.35rem;font-weight:700;margin:10px 0 4px}
+p.section-sub{color:var(--ink-soft);font-size:.9rem;margin-bottom:14px}
+
+/* countdown */
+.countdown{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.countdown .cd-days{font-family:'Source Serif 4',serif;font-size:1.4rem;font-weight:700;color:var(--red)}
+.countdown .cd-lbl{font-size:.78rem;color:var(--ink-soft);line-height:1.4}
+.countdown input[type=date]{padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-size:.85rem}
+
+/* study */
+.due-info{display:flex;gap:10px;margin-bottom:12px}
+.due-pill{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:center}
+.due-pill .num{font-family:'Source Serif 4',serif;font-size:1.3rem;font-weight:700}
+.due-pill .lbl{font-size:.72rem;color:var(--ink-soft);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.due-pill.new .num{color:var(--blue)}
+.due-pill.review .num{color:var(--green)}
+.due-pill.done .num{color:var(--ink-faint)}
+.cat-select{width:100%;padding:11px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);margin-bottom:12px;font-weight:600}
+.study-controls{display:flex;gap:8px}
+.study-controls .cat-select{flex:1}
+.study-mode-switch{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;margin-bottom:10px}
+.study-mode-switch button{flex:1;padding:9px;border-radius:9px;font-weight:700;font-size:.88rem;color:var(--ink-soft)}
+.study-mode-switch button.active{background:var(--ink);color:var(--paper)}
+.cat-tracker{display:flex;gap:10px;flex-wrap:wrap;font-size:.74rem;font-weight:700;margin-bottom:10px;color:var(--ink-soft)}
+.struggle-banner{background:var(--marker-soft);border:1px solid var(--marker);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:.85rem}
+.match-progress{text-align:center;font-size:.82rem;font-weight:700;color:var(--ink-soft);margin-bottom:10px}
+.match-grid{display:flex;gap:10px}
+.match-col{flex:1;display:flex;flex-direction:column;gap:8px}
+.match-tile{padding:14px 10px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:.88rem;text-align:center;transition:transform .1s}
+.match-tile:active{transform:scale(.97)}
+.match-tile.selected{border-color:var(--blue);background:var(--blue-soft);color:var(--blue)}
+.match-tile.matched{background:var(--green-soft);border-color:var(--green);color:var(--green);opacity:.7}
+.match-tile.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+
+.flashcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);min-height:330px;padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;border:1px solid var(--line)}
+.flashcard .level-tag{position:absolute;top:16px;left:16px;font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:500;color:var(--ink-faint);border:1px solid var(--line);border-radius:6px;padding:2px 8px}
+.flashcard .pos-tag{position:absolute;top:16px;right:16px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ink-faint);font-style:italic}
+.headword{font-family:'Source Serif 4',serif;font-weight:700;font-size:2.1rem;letter-spacing:-.01em;position:relative;display:inline-block;padding:0 8px;line-height:1.15}
+.headword.marked::before{content:"";position:absolute;inset:42% -4px 4% -4px;background:var(--marker);z-index:-1;transform:skewX(-8deg) rotate(-1deg);border-radius:4px}
+html[data-theme="dark"] .headword.marked{color:#141926}
+html[data-theme="dark"] .headword.marked::before{inset:8% -6px 2% -6px}
+.ipa{font-family:'JetBrains Mono',monospace;color:var(--ink-faint);font-size:.92rem;margin-top:6px}
+.speak-btn{margin-top:14px;width:46px;height:46px;border-radius:50%;background:var(--blue-soft);color:var(--blue);font-size:1.2rem;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+.speak-btn:active{transform:scale(.92)}
+.card-back{margin-top:20px;padding-top:18px;border-top:1px dashed var(--line);width:100%}
+.meaning{font-size:1.35rem;font-weight:700;color:var(--green)}
+.syn-line{margin-top:6px;font-size:.85rem;color:var(--ink-soft)}
+.syn-line b{color:var(--blue)}
+.example{margin-top:12px;font-family:'Source Serif 4',serif;font-style:italic;font-size:1rem;color:var(--ink-soft);line-height:1.5}
+.example-tr{margin-top:4px;font-size:.86rem;color:var(--ink-faint)}
+.reveal-hint{margin-top:24px;color:var(--ink-faint);font-size:.85rem;font-weight:600}
+.session-progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.session-progress-fill{height:100%;background:var(--blue);transition:width .25s}
+.session-stats{display:flex;gap:12px;justify-content:center;font-size:.74rem;font-weight:700;color:var(--ink-faint);margin-bottom:6px}
+.cloze-prompt{font-family:'Source Serif 4',serif;font-size:1.15rem;font-style:italic;line-height:1.6;color:var(--ink)}
+.hint-text{margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:1rem;letter-spacing:.15em;color:var(--blue)}
+.hint-btn{margin-top:14px}
+.hint-btn:disabled{opacity:.5}
+.lapse-flag{position:absolute;bottom:14px;left:16px;font-size:.7rem;color:var(--red);font-weight:700}
+
+.grade-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.grade-btn{padding:13px 4px;border-radius:12px;font-weight:700;font-size:.88rem;border:1px solid var(--line);background:var(--card);transition:transform .1s}
+.grade-btn:active{transform:scale(.96)}
+.grade-btn .sub{display:block;font-size:.66rem;font-weight:500;color:var(--ink-faint);margin-top:2px}
+.grade-btn.again{color:var(--red);background:var(--red-soft);border-color:transparent}
+.grade-btn.hard{color:#9A6A00;background:var(--marker-soft);border-color:transparent}
+html[data-theme="dark"] .grade-btn.hard{color:var(--marker)}
+.grade-btn.good{color:var(--green);background:var(--green-soft);border-color:transparent}
+.grade-btn.easy{color:var(--blue);background:var(--blue-soft);border-color:transparent}
+
+.big-btn{width:100%;padding:15px;border-radius:14px;background:var(--ink);color:var(--paper);font-weight:700;font-size:1rem;margin-top:12px;transition:transform .1s}
+.big-btn:active{transform:scale(.98)}
+.big-btn.secondary{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.big-btn:disabled{opacity:.5;cursor:default}
+
+.all-done{background:var(--card);border-radius:var(--radius);border:1px solid var(--line);padding:44px 24px;text-align:center;box-shadow:var(--shadow)}
+.all-done .emoji{font-size:2.5rem}
+.all-done h3{font-family:'Source Serif 4',serif;font-size:1.3rem;margin:12px 0 6px}
+.all-done p{color:var(--ink-soft);font-size:.92rem;line-height:1.5}
+
+/* quiz */
+.quiz-setup{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.quiz-setup label{font-size:.8rem;font-weight:700;color:var(--ink-soft);display:block;margin:10px 0 5px}
+.quiz-setup select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--paper)}
+.quiz-progress{display:flex;gap:4px;margin-bottom:16px}
+.quiz-progress span{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.quiz-progress span.done{background:var(--green)}
+.quiz-progress span.wrong{background:var(--red)}
+.quiz-progress span.current{background:var(--ink)}
+.quiz-q{background:var(--card);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow);padding:26px 22px;text-align:center;margin-bottom:14px}
+.quiz-q .direction{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px}
+.quiz-q .word{font-family:'Source Serif 4',serif;font-size:1.7rem;font-weight:700;line-height:1.25}
+.quiz-q .cloze{font-family:'Source Serif 4',serif;font-size:1.15rem;font-style:italic;line-height:1.6}
+.quiz-q .cloze b{color:var(--blue);font-style:normal;letter-spacing:.05em}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:14px 16px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:600;font-size:.98rem;text-align:left;transition:transform .08s}
+.quiz-opt:active{transform:scale(.98)}
+.quiz-opt.correct{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.type-row{display:flex;gap:8px}
+.type-row input{flex:1;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-size:1.05rem}
+.type-row button{padding:14px 18px;border-radius:12px;background:var(--ink);color:var(--paper);font-weight:700}
+.type-feedback{margin-top:10px;padding:13px;border-radius:12px;font-weight:600;text-align:center}
+.type-feedback.ok{background:var(--green-soft);color:var(--green)}
+.type-feedback.no{background:var(--red-soft);color:var(--red)}
+.quiz-result{text-align:center;padding:34px 20px;background:var(--card);border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow)}
+.quiz-result .score{font-family:'Source Serif 4',serif;font-size:3rem;font-weight:700}
+.quiz-result .score small{font-size:1.4rem;color:var(--ink-faint)}
+.skip-btn{margin-top:8px}
+.skip-row{display:flex;gap:8px;margin-top:8px}
+.skip-row .big-btn{margin-top:0}
+.mini-flashcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.mini-en{font-family:'Source Serif 4',serif;font-weight:700;font-size:1.1rem}
+.mini-tr{color:var(--green);font-weight:700;margin-top:2px}
+
+/* words */
+.toolbar{display:flex;gap:8px;margin-bottom:10px}
+.toolbar select{padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+.search-wrap{position:relative;flex:1}
+.search-wrap input{width:100%;padding:12px 40px 12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+.search-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:var(--paper);color:var(--ink-faint);font-size:.85rem;display:flex;align-items:center;justify-content:center}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.chip{padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:.8rem;font-weight:700;color:var(--ink-soft)}
+.chip.hit{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-soft);color:var(--blue)}
+.chip.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.stub.active{background:var(--red);border-color:var(--red);color:#fff}
+.word-item{margin-bottom:8px}
+.word-row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:background .1s}
+.word-row:active{background:var(--paper)}
+.word-item.expanded .word-row{border-radius:12px 12px 0 0;border-bottom:none}
+.wr-detail{background:var(--card);border:1px solid var(--line);border-top:1px dashed var(--line);border-radius:0 0 12px 12px;padding:12px 14px 14px;font-size:.88rem}
+.wr-detail .pos{font-style:italic;color:var(--ink-faint);font-size:.78rem;margin-bottom:6px;display:block}
+.wr-detail .example{font-family:'Source Serif 4',serif;font-style:italic;color:var(--ink-soft);line-height:1.5}
+.wr-detail .example-tr{font-size:.82rem;color:var(--ink-faint);margin-top:3px}
+.wr-detail .syn-line{margin-top:8px;color:var(--ink-soft)}
+.wr-detail .syn-line b{color:var(--blue)}
+.wr-detail .empty{color:var(--ink-faint);font-size:.82rem}
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.word-row .wr-main{flex:1;min-width:0}
+.word-row .wr-en{font-family:'Source Serif 4',serif;font-weight:600;font-size:1.02rem}
+.word-row .wr-tr{font-size:.84rem;color:var(--ink-soft)}
+.word-row .wr-level{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--ink-faint);border:1px solid var(--line);border-radius:5px;padding:1px 6px;white-space:nowrap}
+.word-row .wr-status{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.wr-status.new{background:var(--line)}
+.wr-status.learning{background:var(--marker)}
+.wr-status.known{background:var(--green)}
+.wr-status.stubborn{background:var(--red)}
+.word-row .wr-speak{color:var(--blue);font-size:1.05rem;padding:6px}
+.legend{display:flex;gap:12px;font-size:.74rem;color:var(--ink-soft);margin-bottom:10px;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.count-line{font-size:.78rem;color:var(--ink-faint);margin-bottom:10px}
+
+.add-form,.import-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px}
+.add-form h3,.import-box h3{font-family:'Source Serif 4',serif;font-size:1.05rem;margin-bottom:10px}
+.add-form input,.add-form select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);margin-bottom:8px;background:var(--paper)}
+.form-row{display:flex;gap:8px}
+.form-row>*{flex:1}
+.import-box p{font-size:.82rem;color:var(--ink-soft);line-height:1.5;margin-bottom:10px}
+.import-btns{display:flex;gap:8px;flex-wrap:wrap}
+.import-btns button{flex:1;min-width:120px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-weight:700;font-size:.85rem}
+.import-box textarea{width:100%;min-height:110px;padding:11px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-size:.9rem;resize:vertical;display:none;margin-top:8px}
+.preview-table{margin-top:12px}
+.preview-row{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.dup-badge{font-size:.74rem;padding:4px 10px;border-radius:8px;margin:-2px 0 8px 28px;display:inline-block}
+.dup-exact{background:var(--line);color:var(--ink-faint)}
+.dup-conflict{background:var(--marker-soft);color:#9A6A00}
+.preview-row input[type=checkbox]{width:20px;height:20px;flex-shrink:0}
+.preview-row input[type=text]{flex:1;min-width:0;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-size:.85rem}
+.preview-meta{display:flex;gap:8px;margin:10px 0;align-items:center;font-size:.82rem}
+.preview-meta select{padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--paper)}
+
+/* profile */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px;text-align:center}
+.stat-card .num{font-family:'Source Serif 4',serif;font-size:1.6rem;font-weight:700}
+.stat-card .lbl{font-size:.74rem;color:var(--ink-soft);font-weight:600}
+.streak-flame{color:#E07B00}
+.week-chart,.duel-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.week-chart h3,.duel-card h3{font-size:.85rem;font-weight:700;margin-bottom:12px;color:var(--ink-soft)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:90px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+.bar{width:100%;background:var(--blue-soft);border-radius:5px 5px 0 0;min-height:3px}
+.bar.today{background:var(--marker)}
+.bar-col .day{font-size:.65rem;color:var(--ink-faint);font-weight:600}
+.bar-col .val{font-size:.65rem;color:var(--ink-soft);font-weight:700}
+.duel-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.duel-row .dname{width:44px;font-weight:700;font-size:.85rem}
+.duel-track{flex:1;height:20px;background:var(--paper);border-radius:10px;overflow:hidden}
+.duel-fill{height:100%;border-radius:10px;background:var(--blue);min-width:4px;transition:width .3s}
+.duel-fill.irem{background:var(--green)}
+.duel-row .dval{width:36px;text-align:right;font-weight:700;font-size:.85rem}
+.duel-msg{font-size:.8rem;color:var(--ink-soft);margin-top:4px}
+.settings-row{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.settings-row label{font-weight:600;font-size:.9rem}
+.settings-row .hint{font-size:.72rem;color:var(--ink-faint);display:block;font-weight:500}
+.settings-row input[type=number]{width:74px;padding:8px;border-radius:8px;border:1px solid var(--line);text-align:center;background:var(--paper)}
+.toggle{width:50px;height:28px;border-radius:999px;background:var(--line);position:relative;transition:background .15s;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.toggle.on::after{left:25px}
+.storage-note{font-size:.78rem;color:var(--ink-faint);line-height:1.5;margin-top:12px}
+
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;box-shadow:0 -4px 16px rgba(28,43,75,.06)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;color:var(--ink-faint);font-size:.68rem;font-weight:700}
+nav button .ico{font-size:1.25rem;line-height:1}
+nav button.active{color:var(--ink);background:var(--paper)}
+
+.toast{position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:.85rem;font-weight:600;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="hl">Kelime</span> Defteri <span style="font-size:.7rem;color:var(--ink-faint);font-weight:600">YDS</span></div>
+  <div class="profile-switch" role="group" aria-label="Profil seçimi">
+    <button id="pEmir" onclick="setProfile('emir')">Emir</button>
+    <button id="pIrem" onclick="setProfile('irem')">İrem</button>
+  </div>
+</header>
+
+<main>
+  <!-- ÖĞREN -->
+  <section id="screen-study" class="screen active">
+    <div id="struggleBanner"></div>
+    <div class="countdown" id="countdownCard"></div>
+    <div class="due-info">
+      <div class="due-pill new"><div class="num" id="dueNew">0</div><div class="lbl">Yeni</div></div>
+      <div class="due-pill review"><div class="num" id="dueReview">0</div><div class="lbl">Tekrar</div></div>
+      <div class="due-pill done"><div class="num" id="doneToday">0</div><div class="lbl">Bugün</div></div>
+    </div>
+    <div class="study-mode-switch">
+      <button id="modeCard" class="active" onclick="setStudyMode('card')">🃏 Kart</button>
+      <button id="modeMatch" onclick="setStudyMode('match')">🔗 Eşleştir</button>
+    </div>
+    <div class="study-controls">
+      <select class="cat-select" id="studyCat" onchange="onStudyCatChange()" aria-label="Kategori seçimi"></select>
+      <select class="cat-select" id="sessionSize" onchange="session=null;renderStudy()" aria-label="Oturum kelime sayısı">
+        <option value="0">Tüm kelimeler</option>
+        <option value="10">10 kelime</option>
+        <option value="20" selected>20 kelime</option>
+        <option value="30">30 kelime</option>
+        <option value="50">50 kelime</option>
+      </select>
+    </div>
+    <select class="cat-select" id="studySub" style="display:none" onchange="session=null;matchGame=null;renderStudy()" aria-label="Alt grup seçimi"></select>
+    <div class="cat-tracker" id="catTracker"></div>
+    <div id="studyArea"></div>
+  </section>
+
+  <!-- TEST -->
+  <section id="screen-quiz" class="screen">
+    <h2 class="section-title">Test</h2>
+    <p class="section-sub">YDS formatında kendini sına.</p>
+    <div id="quizArea"></div>
+  </section>
+
+  <!-- KELİMELER -->
+  <section id="screen-words" class="screen">
+    <h2 class="section-title">Kelimeler</h2>
+    <div class="chip-row" id="statusLegend"></div>
+    <div class="chip-row" id="catChips"></div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <input type="text" id="wordSearch" placeholder="Ara..." oninput="renderWordList()" onsearch="renderWordList()" onchange="renderWordList()">
+        <button id="wordSearchClear" class="search-clear" onclick="clearWordSearch()" aria-label="Aramayı temizle" style="display:none">✕</button>
+      </div>
+    </div>
+    <div class="count-line" id="countLine"></div>
+
+    <div class="import-box">
+      <h3>Toplu içe aktar</h3>
+      <p>PDF, CSV veya kopyala-yapıştır ile kelime listesi ekle. "İngilizce – Türkçe" satırları otomatik ayıklanır; içe aktarmadan önce düzenleyebilirsin. Taranmış (fotoğraf) PDF'ler okunamaz.</p>
+      <div class="import-btns">
+        <button onclick="document.getElementById('pdfFile').click()">📄 PDF</button>
+        <button onclick="document.getElementById('csvFile').click()">📊 CSV</button>
+        <button onclick="togglePaste()">📋 Yapıştır</button>
+      </div>
+      <input type="file" id="pdfFile" accept=".pdf" style="display:none" onchange="handlePdf(event)">
+      <input type="file" id="csvFile" accept=".csv,.txt" style="display:none" onchange="handleCsv(event)">
+      <textarea id="pasteArea" placeholder="Her satıra bir kelime:&#10;comprehensive - kapsamlı&#10;deteriorate : kötüleşmek"></textarea>
+      <button class="big-btn secondary" id="parsePasteBtn" style="display:none" onclick="parsePaste()">Ayıkla</button>
+      <div class="preview-table" id="previewArea"></div>
+    </div>
+
+    <div class="add-form">
+      <h3>Tek kelime ekle</h3>
+      <div class="form-row">
+        <input id="addEn" placeholder="İngilizce">
+        <input id="addTr" placeholder="Türkçe anlamı">
+      </div>
+      <div class="form-row">
+        <input id="addEx" placeholder="Örnek cümle (isteğe bağlı)">
+        <select id="addLevel"><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option></select>
+      </div>
+      <input id="addSyn" placeholder="Eş anlamlı (isteğe bağlı)">
+      <select id="addCat" onchange="handleNewCatOption('addCat')"></select>
+      <button class="big-btn" style="margin-top:4px" onclick="addWord()">Kelimeyi ekle</button>
+    </div>
+    <div id="wordList"></div>
+  </section>
+
+  <!-- PROFİL -->
+  <section id="screen-profile" class="screen">
+    <h2 class="section-title" id="profileTitle">Profil</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num streak-flame" id="stStreak">0 🔥</div><div class="lbl">Günlük seri</div></div>
+      <button class="stat-card" style="cursor:pointer" onclick="goToWordStatus('known')"><div class="num" id="stKnown">0</div><div class="lbl">Öğrenilen</div></button>
+      <button class="stat-card" style="cursor:pointer" onclick="goToWordStatus('learning')"><div class="num" id="stLearning">0</div><div class="lbl">Öğreniliyor</div></button>
+      <button class="stat-card" style="cursor:pointer" onclick="goToWordStatus('stubborn')"><div class="num" id="stStubborn">0</div><div class="lbl">İnatçı kelime</div></button>
+    </div>
+    <div class="duel-card">
+      <h3>Haftalık düello ⚔️ (son 7 gün tekrar sayısı)</h3>
+      <div id="duelArea"></div>
+    </div>
+    <div class="week-chart">
+      <h3>Son 7 gün</h3>
+      <div class="bars" id="weekBars"></div>
+    </div>
+    <div class="settings-row">
+      <label>Günlük yeni kelime<span class="hint">0 = sınırsız</span></label>
+      <input type="number" id="newPerDay" min="0" max="200" onchange="saveNewPerDay()">
+    </div>
+    <div class="settings-row">
+      <label>Koyu tema<span class="hint">Gece nöbetleri için</span></label>
+      <button class="toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Koyu tema aç/kapat"></button>
+    </div>
+    <button class="big-btn secondary" onclick="copyClaudePrompt()">🤖 Zayıf kelimelerimle Claude'a paragraf yazdır</button>
+    <button class="big-btn secondary" onclick="exportData()">Verileri yedekle (JSON indir)</button>
+    <button class="big-btn secondary" onclick="document.getElementById('importFile').click()">Yedekten geri yükle</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="big-btn secondary" style="color:var(--red);border-color:var(--red)" onclick="resetProgress()">⚠️ Tüm ilerlemeyi sıfırla</button>
+    <p class="storage-note">Veriler bu cihazın tarayıcısında saklanır. Cihazlar arası taşımak için yedekle / geri yükle kullanın. Emir ve İrem profillerinin ilerlemesi ayrı tutulur; sınav tarihi ve kelime listesi ortaktır.</p>
+  </section>
+</main>
+
+<nav>
+  <button id="navStudy" class="active" onclick="showScreen('study')"><span class="ico">📖</span>Öğren</button>
+  <button id="navQuiz" onclick="showScreen('quiz')"><span class="ico">✏️</span>Test</button>
+  <button id="navWords" onclick="showScreen('words')"><span class="ico">🗂️</span>Kelimeler</button>
+  <button id="navProfile" onclick="showScreen('profile')"><span class="ico">👤</span>Profil</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= DECKS ================= */
+const CATS={ders:"Ders Notları 🎧",defter:"Defterim 📓",akademik:"Akademik",phrasal:"Phrasal",edat:"Edat kalıbı",baglac:"Bağlaç",genel:"Genel",ozel:"Eklediklerim"};
+const WORDS=[
+{id:1,en:"improve",tr:"geliştirmek, iyileştirmek",ipa:"/ɪmˈpruːv/",pos:"v.",ex:"I want to improve my English.",exTr:"İngilizcemi geliştirmek istiyorum.",level:"A2",cat:"genel"},
+{id:2,en:"achieve",tr:"başarmak, elde etmek",ipa:"/əˈtʃiːv/",pos:"v.",ex:"She achieved her goal.",exTr:"Hedefine ulaştı.",level:"B1",cat:"genel"},
+{id:3,en:"available",tr:"mevcut, uygun",ipa:"/əˈveɪləbl/",pos:"adj.",ex:"The doctor is available now.",exTr:"Doktor şu an müsait.",level:"A2",cat:"genel"},
+{id:4,en:"decide",tr:"karar vermek",ipa:"/dɪˈsaɪd/",pos:"v.",ex:"We decided to stay home.",exTr:"Evde kalmaya karar verdik.",level:"A2",cat:"genel"},
+{id:5,en:"suggest",tr:"önermek",ipa:"/səˈdʒest/",pos:"v.",ex:"I suggest we leave early.",exTr:"Erken çıkmamızı öneririm.",level:"B1",cat:"genel"},
+{id:6,en:"require",tr:"gerektirmek",ipa:"/rɪˈkwaɪər/",pos:"v.",ex:"This job requires patience.",exTr:"Bu iş sabır gerektirir.",level:"B1",cat:"genel"},
+{id:7,en:"increase",tr:"artmak, artırmak",ipa:"/ɪnˈkriːs/",pos:"v.",ex:"Prices increased last year.",exTr:"Fiyatlar geçen yıl arttı.",level:"B1",cat:"genel"},
+{id:8,en:"decrease",tr:"azalmak, azaltmak",ipa:"/dɪˈkriːs/",pos:"v.",ex:"The pain decreased after treatment.",exTr:"Tedaviden sonra ağrı azaldı.",level:"B1",cat:"genel"},
+{id:9,en:"prevent",tr:"önlemek, engellemek",ipa:"/prɪˈvent/",pos:"v.",ex:"Vaccines prevent disease.",exTr:"Aşılar hastalığı önler.",level:"B1",cat:"genel"},
+{id:10,en:"consider",tr:"düşünmek, göz önünde bulundurmak",ipa:"/kənˈsɪdər/",pos:"v.",ex:"Consider all the options.",exTr:"Tüm seçenekleri değerlendir.",level:"B1",cat:"genel"},
+{id:11,en:"although",tr:"her ne kadar, -e rağmen",ipa:"/ɔːlˈðəʊ/",pos:"conj.",ex:"Although it rained, we went out.",exTr:"Yağmur yağmasına rağmen dışarı çıktık.",level:"B1",cat:"genel"},
+{id:12,en:"however",tr:"ancak, bununla birlikte",ipa:"/haʊˈevər/",pos:"adv.",ex:"It was hard; however, we finished.",exTr:"Zordu; ancak bitirdik.",level:"B1",cat:"genel"},
+{id:13,en:"therefore",tr:"bu yüzden, dolayısıyla",ipa:"/ˈðeəfɔːr/",pos:"adv.",ex:"He was ill, therefore he stayed home.",exTr:"Hastaydı, bu yüzden evde kaldı.",level:"B1",cat:"genel"},
+{id:14,en:"weather",tr:"hava durumu",ipa:"/ˈweðər/",pos:"n.",ex:"The weather is lovely today.",exTr:"Bugün hava çok güzel.",level:"A1",cat:"genel"},
+{id:15,en:"breakfast",tr:"kahvaltı",ipa:"/ˈbrekfəst/",pos:"n.",ex:"We had breakfast at eight.",exTr:"Saat sekizde kahvaltı yaptık.",level:"A1",cat:"genel"},
+{id:16,en:"early",tr:"erken",ipa:"/ˈɜːli/",pos:"adj.",ex:"I wake up early every day.",exTr:"Her gün erken kalkarım.",level:"A1",cat:"genel"},
+{id:17,en:"expensive",tr:"pahalı",ipa:"/ɪkˈspensɪv/",pos:"adj.",ex:"This hotel is too expensive.",exTr:"Bu otel çok pahalı.",level:"A1",cat:"genel"},
+{id:18,en:"cheap",tr:"ucuz",ipa:"/tʃiːp/",pos:"adj.",ex:"The tickets were cheap.",exTr:"Biletler ucuzdu.",level:"A1",cat:"genel"},
+{id:19,en:"crowded",tr:"kalabalık",ipa:"/ˈkraʊdɪd/",pos:"adj.",ex:"The bus was very crowded.",exTr:"Otobüs çok kalabalıktı.",level:"A2",cat:"genel"},
+{id:20,en:"quiet",tr:"sessiz, sakin",ipa:"/ˈkwaɪət/",pos:"adj.",ex:"Please be quiet in the library.",exTr:"Lütfen kütüphanede sessiz olun.",level:"A1",cat:"genel"},
+{id:21,en:"borrow",tr:"ödünç almak",ipa:"/ˈbɒrəʊ/",pos:"v.",ex:"Can I borrow your pen?",exTr:"Kalemini ödünç alabilir miyim?",level:"A2",cat:"genel"},
+{id:22,en:"lend",tr:"ödünç vermek",ipa:"/lend/",pos:"v.",ex:"She lent me her umbrella.",exTr:"Bana şemsiyesini ödünç verdi.",level:"A2",cat:"genel"},
+{id:23,en:"arrive",tr:"varmak, ulaşmak",ipa:"/əˈraɪv/",pos:"v.",ex:"The train arrives at noon.",exTr:"Tren öğlen varıyor.",level:"A1",cat:"genel"},
+{id:24,en:"forget",tr:"unutmak",ipa:"/fəˈɡet/",pos:"v.",ex:"Don't forget your keys.",exTr:"Anahtarlarını unutma.",level:"A1",cat:"genel"},
+{id:25,en:"remember",tr:"hatırlamak",ipa:"/rɪˈmembər/",pos:"v.",ex:"I remember our first trip.",exTr:"İlk seyahatimizi hatırlıyorum.",level:"A1",cat:"genel"},
+{id:26,en:"famous",tr:"ünlü",ipa:"/ˈfeɪməs/",pos:"adj.",ex:"Istanbul is famous for its history.",exTr:"İstanbul tarihiyle ünlüdür.",level:"A1",cat:"genel"},
+{id:27,en:"dangerous",tr:"tehlikeli",ipa:"/ˈdeɪndʒərəs/",pos:"adj.",ex:"Driving fast is dangerous.",exTr:"Hızlı araba kullanmak tehlikelidir.",level:"A2",cat:"genel"},
+{id:28,en:"healthy",tr:"sağlıklı",ipa:"/ˈhelθi/",pos:"adj.",ex:"Eat healthy food every day.",exTr:"Her gün sağlıklı yiyecekler ye.",level:"A1",cat:"genel"},
+{id:29,en:"tired",tr:"yorgun",ipa:"/ˈtaɪəd/",pos:"adj.",ex:"I was tired after the night shift.",exTr:"Gece nöbetinden sonra yorgundum.",level:"A1",cat:"genel"},
+{id:30,en:"angry",tr:"kızgın, öfkeli",ipa:"/ˈæŋɡri/",pos:"adj.",ex:"Why are you angry with me?",exTr:"Bana neden kızgınsın?",level:"A1",cat:"genel"},
+{id:31,en:"journey",tr:"yolculuk",ipa:"/ˈdʒɜːni/",pos:"n.",ex:"It was a long journey home.",exTr:"Eve uzun bir yolculuktu.",level:"A2",cat:"genel"},
+{id:32,en:"neighbour",tr:"komşu",ipa:"/ˈneɪbər/",pos:"n.",ex:"Our neighbours are very kind.",exTr:"Komşularımız çok nazik.",level:"A2",cat:"genel"},
+{id:33,en:"holiday",tr:"tatil",ipa:"/ˈhɒlədeɪ/",pos:"n.",ex:"We are planning a holiday in June.",exTr:"Haziranda bir tatil planlıyoruz.",level:"A1",cat:"genel"},
+{id:34,en:"luggage",tr:"bagaj, valizler",ipa:"/ˈlʌɡɪdʒ/",pos:"n.",ex:"My luggage was lost at the airport.",exTr:"Bagajım havalimanında kayboldu.",level:"A2",cat:"genel"},
+{id:35,en:"receipt",tr:"fiş, makbuz",ipa:"/rɪˈsiːt/",pos:"n.",ex:"Keep the receipt for a refund.",exTr:"İade için fişi sakla.",level:"A2",cat:"genel"},
+{id:36,en:"discount",tr:"indirim",ipa:"/ˈdɪskaʊnt/",pos:"n.",ex:"They gave us a ten percent discount.",exTr:"Bize yüzde on indirim yaptılar.",level:"A2",cat:"genel"},
+{id:37,en:"customer",tr:"müşteri",ipa:"/ˈkʌstəmər/",pos:"n.",ex:"The customer is always right.",exTr:"Müşteri her zaman haklıdır.",level:"A2",cat:"genel"},
+{id:38,en:"queue",tr:"kuyruk, sıra",ipa:"/kjuː/",pos:"n.",ex:"There was a long queue at the bank.",exTr:"Bankada uzun bir kuyruk vardı.",level:"A2",cat:"genel"},
+{id:39,en:"appointment",tr:"randevu",ipa:"/əˈpɔɪntmənt/",pos:"n.",ex:"I have a dentist appointment tomorrow.",exTr:"Yarın diş hekimi randevum var.",level:"A2",cat:"genel"},
+{id:40,en:"employee",tr:"çalışan, personel",ipa:"/ɪmˈplɔɪiː/",pos:"n.",ex:"The company has fifty employees.",exTr:"Şirketin elli çalışanı var.",level:"B1",cat:"genel"},
+{id:41,en:"experience",tr:"deneyim",ipa:"/ɪkˈspɪəriəns/",pos:"n.",ex:"She has years of experience.",exTr:"Yıllarca deneyimi var.",level:"A2",cat:"genel"},
+{id:42,en:"knowledge",tr:"bilgi",ipa:"/ˈnɒlɪdʒ/",pos:"n.",ex:"Knowledge is power.",exTr:"Bilgi güçtür.",level:"B1",cat:"genel"},
+{id:43,en:"opportunity",tr:"fırsat",ipa:"/ˌɒpəˈtjuːnəti/",pos:"n.",ex:"This is a great opportunity for you.",exTr:"Bu senin için harika bir fırsat.",level:"B1",cat:"genel"},
+{id:44,en:"responsibility",tr:"sorumluluk",ipa:"/rɪˌspɒnsəˈbɪləti/",pos:"n.",ex:"It is my responsibility to help.",exTr:"Yardım etmek benim sorumluluğum.",level:"B1",cat:"genel"},
+{id:45,en:"environment",tr:"çevre",ipa:"/ɪnˈvaɪrənmənt/",pos:"n.",ex:"We must protect the environment.",exTr:"Çevreyi korumalıyız.",level:"B1",cat:"genel"},
+{id:46,en:"government",tr:"hükümet",ipa:"/ˈɡʌvənmənt/",pos:"n.",ex:"The government announced new rules.",exTr:"Hükümet yeni kurallar açıkladı.",level:"B1",cat:"genel"},
+{id:47,en:"society",tr:"toplum",ipa:"/səˈsaɪəti/",pos:"n.",ex:"Education shapes society.",exTr:"Eğitim toplumu şekillendirir.",level:"B1",cat:"genel"},
+{id:48,en:"behaviour",tr:"davranış",ipa:"/bɪˈheɪvjər/",pos:"n.",ex:"His behaviour surprised everyone.",exTr:"Davranışı herkesi şaşırttı.",level:"B1",cat:"genel"},
+{id:49,en:"attitude",tr:"tutum, tavır",ipa:"/ˈætɪtjuːd/",pos:"n.",ex:"A positive attitude helps a lot.",exTr:"Olumlu bir tutum çok yardımcı olur.",level:"B1",cat:"genel"},
+{id:50,en:"advantage",tr:"avantaj, üstünlük",ipa:"/ədˈvɑːntɪdʒ/",pos:"n.",ex:"Speaking English is a big advantage.",exTr:"İngilizce konuşmak büyük bir avantaj.",level:"B1",cat:"genel"},
+{id:51,en:"disadvantage",tr:"dezavantaj",ipa:"/ˌdɪsədˈvɑːntɪdʒ/",pos:"n.",ex:"Every plan has some disadvantages.",exTr:"Her planın bazı dezavantajları vardır.",level:"B1",cat:"genel"},
+{id:52,en:"solution",tr:"çözüm",ipa:"/səˈluːʃn/",pos:"n.",ex:"We found a simple solution.",exTr:"Basit bir çözüm bulduk.",level:"B1",cat:"genel"},
+{id:53,en:"decision",tr:"karar",ipa:"/dɪˈsɪʒn/",pos:"n.",ex:"It was a difficult decision.",exTr:"Zor bir karardı.",level:"A2",cat:"genel"},
+{id:54,en:"purpose",tr:"amaç",ipa:"/ˈpɜːpəs/",pos:"n.",ex:"What is the purpose of this meeting?",exTr:"Bu toplantının amacı ne?",level:"B1",cat:"genel"},
+{id:55,en:"reason",tr:"sebep, neden",ipa:"/ˈriːzn/",pos:"n.",ex:"Give me one good reason.",exTr:"Bana iyi bir sebep söyle.",level:"A2",cat:"genel"},
+{id:56,en:"result",tr:"sonuç",ipa:"/rɪˈzʌlt/",pos:"n.",ex:"The test results were normal.",exTr:"Test sonuçları normaldi.",level:"A2",cat:"genel"},
+{id:57,en:"describe",tr:"tanımlamak, betimlemek",ipa:"/dɪˈskraɪb/",pos:"v.",ex:"Describe the pain, please.",exTr:"Lütfen ağrıyı tarif edin.",level:"A2",cat:"genel"},
+{id:58,en:"explain",tr:"açıklamak",ipa:"/ɪkˈspleɪn/",pos:"v.",ex:"Can you explain this word?",exTr:"Bu kelimeyi açıklayabilir misin?",level:"A2",cat:"genel"},
+{id:59,en:"compare",tr:"karşılaştırmak",ipa:"/kəmˈpeər/",pos:"v.",ex:"Compare the two prices.",exTr:"İki fiyatı karşılaştır.",level:"B1",cat:"genel"},
+{id:60,en:"complain",tr:"şikâyet etmek",ipa:"/kəmˈpleɪn/",pos:"v.",ex:"He complained about the noise.",exTr:"Gürültüden şikâyet etti.",level:"B1",cat:"genel"},
+{id:61,en:"promise",tr:"söz vermek",ipa:"/ˈprɒmɪs/",pos:"v.",ex:"I promise to call you.",exTr:"Seni arayacağıma söz veriyorum.",level:"A2",cat:"genel"},
+{id:62,en:"refuse",tr:"reddetmek",ipa:"/rɪˈfjuːz/",pos:"v.",ex:"She refused the offer.",exTr:"Teklifi reddetti.",level:"B1",cat:"genel"},
+{id:63,en:"accept",tr:"kabul etmek",ipa:"/əkˈsept/",pos:"v.",ex:"They accepted our invitation.",exTr:"Davetimizi kabul ettiler.",level:"A2",cat:"genel"},
+{id:64,en:"invite",tr:"davet etmek",ipa:"/ɪnˈvaɪt/",pos:"v.",ex:"We invited them to dinner.",exTr:"Onları yemeğe davet ettik.",level:"A2",cat:"genel"},
+{id:65,en:"celebrate",tr:"kutlamak",ipa:"/ˈselɪbreɪt/",pos:"v.",ex:"We celebrated her birthday.",exTr:"Doğum gününü kutladık.",level:"A2",cat:"genel"},
+{id:66,en:"encourage",tr:"cesaretlendirmek, teşvik etmek",ipa:"/ɪnˈkʌrɪdʒ/",pos:"v.",ex:"Teachers encourage their students.",exTr:"Öğretmenler öğrencilerini teşvik eder.",level:"B1",cat:"genel"},
+{id:67,en:"support",tr:"desteklemek",ipa:"/səˈpɔːt/",pos:"v.",ex:"My family supports my career.",exTr:"Ailem kariyerimi destekliyor.",level:"A2",cat:"genel"},
+{id:68,en:"protect",tr:"korumak",ipa:"/prəˈtekt/",pos:"v.",ex:"Sunscreen protects your skin.",exTr:"Güneş kremi cildini korur.",level:"A2",cat:"genel"},
+{id:69,en:"develop",tr:"geliştirmek",ipa:"/dɪˈveləp/",pos:"v.",ex:"Children develop quickly.",exTr:"Çocuklar hızlı gelişir.",level:"B1",cat:"genel"},
+{id:70,en:"discover",tr:"keşfetmek",ipa:"/dɪˈskʌvər/",pos:"v.",ex:"They discovered a new island.",exTr:"Yeni bir ada keşfettiler.",level:"A2",cat:"genel"},
+{id:71,en:"realize",tr:"fark etmek",ipa:"/ˈrɪəlaɪz/",pos:"v.",ex:"I realized I was wrong.",exTr:"Yanıldığımı fark ettim.",level:"B1",cat:"genel"},
+{id:72,en:"belong",tr:"ait olmak",ipa:"/bɪˈlɒŋ/",pos:"v.",ex:"This bag belongs to İrem.",exTr:"Bu çanta İrem'e ait.",level:"A2",cat:"genel"},
+{id:73,en:"depend",tr:"bağlı olmak",ipa:"/dɪˈpend/",pos:"v.",ex:"It depends on the weather.",exTr:"Hava durumuna bağlı.",level:"B1",cat:"genel"},
+{id:74,en:"avoid",tr:"kaçınmak",ipa:"/əˈvɔɪd/",pos:"v.",ex:"Avoid sugary drinks.",exTr:"Şekerli içeceklerden kaçının.",level:"B1",cat:"genel"},
+{id:75,en:"attend",tr:"katılmak",ipa:"/əˈtend/",pos:"v.",ex:"She attended the conference.",exTr:"Konferansa katıldı.",level:"B1",cat:"genel"},
+{id:76,en:"afford",tr:"gücü yetmek, karşılayabilmek",ipa:"/əˈfɔːd/",pos:"v.",ex:"We can't afford a new car.",exTr:"Yeni bir arabayı karşılayamayız.",level:"B1",cat:"genel"},
+{id:77,en:"deserve",tr:"hak etmek",ipa:"/dɪˈzɜːv/",pos:"v.",ex:"You deserve a holiday.",exTr:"Bir tatili hak ediyorsun.",level:"B1",cat:"genel"},
+{id:78,en:"convince",tr:"ikna etmek",ipa:"/kənˈvɪns/",pos:"v.",ex:"He convinced me to try.",exTr:"Beni denemeye ikna etti.",level:"B2",cat:"genel"},
+{id:79,en:"assume",tr:"varsaymak",ipa:"/əˈsjuːm/",pos:"v.",ex:"Don't assume anything.",exTr:"Hiçbir şeyi varsayma.",level:"B2",cat:"genel"},
+{id:80,en:"estimate",tr:"tahmin etmek",ipa:"/ˈestɪmeɪt/",pos:"v.",ex:"They estimated the cost.",exTr:"Maliyeti tahmin ettiler.",level:"B2",cat:"genel"},
+{id:81,en:"maintain",tr:"sürdürmek, korumak",ipa:"/meɪnˈteɪn/",pos:"v.",ex:"Maintain a healthy weight.",exTr:"Sağlıklı bir kiloyu koru.",level:"B2",cat:"genel"},
+{id:82,en:"obtain",tr:"elde etmek",ipa:"/əbˈteɪn/",pos:"v.",ex:"You must obtain permission first.",exTr:"Önce izin almalısın.",level:"B2",cat:"genel"},
+{id:83,en:"reduce",tr:"azaltmak",ipa:"/rɪˈdjuːs/",pos:"v.",ex:"Reduce your salt intake.",exTr:"Tuz alımını azalt.",level:"B1",cat:"genel"},
+{id:84,en:"remain",tr:"kalmak, sürmek",ipa:"/rɪˈmeɪn/",pos:"v.",ex:"Please remain seated.",exTr:"Lütfen yerinizde kalın.",level:"B2",cat:"genel"},
+{id:85,en:"reliable",tr:"güvenilir",ipa:"/rɪˈlaɪəbl/",pos:"adj.",ex:"She is a reliable friend.",exTr:"O güvenilir bir arkadaş.",level:"B1",cat:"genel"},
+{id:86,en:"confident",tr:"özgüvenli, emin",ipa:"/ˈkɒnfɪdənt/",pos:"adj.",ex:"Be confident in the exam.",exTr:"Sınavda kendine güven.",level:"B1",cat:"genel"},
+{id:87,en:"anxious",tr:"kaygılı, endişeli",ipa:"/ˈæŋkʃəs/",pos:"adj.",ex:"He felt anxious before the flight.",exTr:"Uçuştan önce kaygılıydı.",level:"B2",cat:"genel"},
+{id:88,en:"exhausted",tr:"bitkin, çok yorgun",ipa:"/ɪɡˈzɔːstɪd/",pos:"adj.",ex:"I was exhausted after work.",exTr:"İşten sonra bitkin düşmüştüm.",level:"B1",cat:"genel"},
+{id:89,en:"disappointed",tr:"hayal kırıklığına uğramış",ipa:"/ˌdɪsəˈpɔɪntɪd/",pos:"adj.",ex:"She was disappointed with the result.",exTr:"Sonuçtan hayal kırıklığına uğradı.",level:"B1",cat:"genel"},
+{id:90,en:"grateful",tr:"minnettar",ipa:"/ˈɡreɪtfl/",pos:"adj.",ex:"I am grateful for your help.",exTr:"Yardımın için minnettarım.",level:"B1",cat:"genel"},
+{id:91,en:"generous",tr:"cömert",ipa:"/ˈdʒenərəs/",pos:"adj.",ex:"He is generous with his time.",exTr:"Zamanı konusunda cömerttir.",level:"B1",cat:"genel"},
+{id:92,en:"stubborn",tr:"inatçı",ipa:"/ˈstʌbən/",pos:"adj.",ex:"Don't be so stubborn.",exTr:"Bu kadar inatçı olma.",level:"B2",cat:"genel"},
+{id:93,en:"curious",tr:"meraklı",ipa:"/ˈkjʊəriəs/",pos:"adj.",ex:"Children are naturally curious.",exTr:"Çocuklar doğal olarak meraklıdır.",level:"B1",cat:"genel"},
+{id:94,en:"patient",tr:"sabırlı",ipa:"/ˈpeɪʃnt/",pos:"adj.",ex:"Be patient, it takes time.",exTr:"Sabırlı ol, zaman alır.",level:"A2",cat:"genel"},
+{id:95,en:"polite",tr:"kibar, nazik",ipa:"/pəˈlaɪt/",pos:"adj.",ex:"Always be polite to strangers.",exTr:"Yabancılara karşı her zaman kibar ol.",level:"A2",cat:"genel"},
+{id:96,en:"rude",tr:"kaba",ipa:"/ruːd/",pos:"adj.",ex:"It is rude to interrupt.",exTr:"Sözünü kesmek kabalıktır.",level:"A2",cat:"genel"},
+{id:97,en:"honest",tr:"dürüst",ipa:"/ˈɒnɪst/",pos:"adj.",ex:"Be honest with me.",exTr:"Bana karşı dürüst ol.",level:"A2",cat:"genel"},
+{id:98,en:"fair",tr:"adil",ipa:"/feər/",pos:"adj.",ex:"That is not a fair decision.",exTr:"Bu adil bir karar değil.",level:"B1",cat:"genel"},
+{id:99,en:"suitable",tr:"uygun",ipa:"/ˈsuːtəbl/",pos:"adj.",ex:"This film is suitable for children.",exTr:"Bu film çocuklar için uygun.",level:"B1",cat:"genel"},
+{id:100,en:"necessary",tr:"gerekli",ipa:"/ˈnesəsəri/",pos:"adj.",ex:"Sleep is necessary for health.",exTr:"Uyku sağlık için gereklidir.",level:"B1",cat:"genel"},
+{id:101,en:"apologize",tr:"özür dilemek",ipa:"/əˈpɒlədʒaɪz/",pos:"v.",ex:"He apologized for being late.",exTr:"Geç kaldığı için özür diledi.",level:"B1",cat:"genel"},
+{id:102,en:"recommend",tr:"tavsiye etmek",ipa:"/ˌrekəˈmend/",pos:"v.",ex:"Can you recommend a restaurant?",exTr:"Bir restoran tavsiye edebilir misin?",level:"B1",cat:"genel"},
+{id:103,en:"improvement",tr:"gelişme, iyileşme",ipa:"/ɪmˈpruːvmənt/",pos:"n.",ex:"There is a clear improvement.",exTr:"Belirgin bir iyileşme var.",level:"B1",cat:"genel"},
+{id:104,en:"success",tr:"başarı",ipa:"/səkˈses/",pos:"n.",ex:"Hard work brings success.",exTr:"Sıkı çalışma başarı getirir.",level:"A2",cat:"genel"},
+{id:105,en:"failure",tr:"başarısızlık",ipa:"/ˈfeɪljər/",pos:"n.",ex:"Failure is part of learning.",exTr:"Başarısızlık öğrenmenin bir parçasıdır.",level:"B1",cat:"genel"},
+{id:106,en:"effort",tr:"çaba",ipa:"/ˈefət/",pos:"n.",ex:"She put a lot of effort into it.",exTr:"Buna çok çaba harcadı.",level:"B1",cat:"genel"},
+{id:107,en:"habit",tr:"alışkanlık",ipa:"/ˈhæbɪt/",pos:"n.",ex:"Reading is a good habit.",exTr:"Okumak iyi bir alışkanlıktır.",level:"A2",cat:"genel"},
+{id:108,en:"skill",tr:"beceri",ipa:"/skɪl/",pos:"n.",ex:"Cooking is a useful skill.",exTr:"Yemek yapmak faydalı bir beceridir.",level:"A2",cat:"genel"},
+{id:109,en:"crowd",tr:"kalabalık (isim)",ipa:"/kraʊd/",pos:"n.",ex:"A crowd gathered in the square.",exTr:"Meydanda bir kalabalık toplandı.",level:"B1",cat:"genel"},
+{id:110,en:"traffic",tr:"trafik",ipa:"/ˈtræfɪk/",pos:"n.",ex:"The traffic was terrible this morning.",exTr:"Bu sabah trafik berbattı.",level:"A2",cat:"genel"},
+{id:111,en:"whole",tr:"bütün, tüm",ipa:"/həʊl/",pos:"adj.",ex:"We spent the whole day at the beach.",exTr:"Bütün günü plajda geçirdik.",level:"A2",cat:"genel"},
+{id:112,en:"several",tr:"birkaç",ipa:"/ˈsevrəl/",pos:"det.",ex:"I called you several times.",exTr:"Seni birkaç kez aradım.",level:"B1",cat:"genel"},
+{id:113,en:"enough",tr:"yeterli",ipa:"/ɪˈnʌf/",pos:"det.",ex:"We have enough time.",exTr:"Yeterince zamanımız var.",level:"A1",cat:"genel"},
+{id:114,en:"almost",tr:"neredeyse",ipa:"/ˈɔːlməʊst/",pos:"adv.",ex:"Dinner is almost ready.",exTr:"Akşam yemeği neredeyse hazır.",level:"A2",cat:"genel"},
+{id:115,en:"suddenly",tr:"aniden",ipa:"/ˈsʌdənli/",pos:"adv.",ex:"Suddenly, the lights went out.",exTr:"Aniden ışıklar söndü.",level:"A2",cat:"genel"},
+{id:116,en:"immediately",tr:"hemen, derhal",ipa:"/ɪˈmiːdiətli/",pos:"adv.",ex:"Call me immediately.",exTr:"Beni hemen ara.",level:"B1",cat:"genel"},
+{id:117,en:"probably",tr:"muhtemelen",ipa:"/ˈprɒbəbli/",pos:"adv.",ex:"It will probably rain tomorrow.",exTr:"Yarın muhtemelen yağmur yağacak.",level:"A2",cat:"genel"},
+{id:118,en:"actually",tr:"aslında",ipa:"/ˈæktʃuəli/",pos:"adv.",ex:"Actually, I agree with you.",exTr:"Aslında sana katılıyorum.",level:"B1",cat:"genel"},
+{id:119,en:"instead",tr:"onun yerine",ipa:"/ɪnˈsted/",pos:"adv.",ex:"Let's walk instead of driving.",exTr:"Araba yerine yürüyelim.",level:"A2",cat:"genel"},
+{id:120,en:"unfortunately",tr:"maalesef",ipa:"/ʌnˈfɔːtʃənətli/",pos:"adv.",ex:"Unfortunately, the shop was closed.",exTr:"Maalesef dükkân kapalıydı.",level:"B1",cat:"genel"}
+,
+/* --- BAĞLAÇLAR --- */
+{id:201,en:"although",tr:"her ne kadar, -e rağmen (+ cümle)",pos:"conj.",ex:"Although the sample was small, the results were significant.",syn:"despite, even though",level:"B2",cat:"baglac"},
+{id:202,en:"whereas",tr:"oysa, halbuki (zıtlık)",pos:"conj.",ex:"Group A improved, whereas Group B remained stable.",syn:"while (zıtlık)",level:"C1",cat:"baglac"},
+{id:203,en:"despite",tr:"-e rağmen (+ isim/Ving)",pos:"prep.",ex:"Despite the treatment, symptoms persisted.",syn:"in spite of",level:"B2",cat:"baglac"},
+{id:204,en:"nevertheless",tr:"yine de, buna rağmen",pos:"adv.",ex:"The risk was high; nevertheless, they proceeded.",syn:"nonetheless",level:"C1",cat:"baglac"},
+{id:205,en:"nonetheless",tr:"yine de (nevertheless eş anlamlısı)",pos:"adv.",ex:"The data were limited; nonetheless, a pattern emerged.",syn:"nevertheless",level:"C1",cat:"baglac"},
+{id:206,en:"moreover",tr:"dahası, üstelik",pos:"adv.",ex:"The method is cheap; moreover, it is fast.",syn:"furthermore",level:"C1",cat:"baglac"},
+{id:207,en:"furthermore",tr:"ayrıca, bundan başka",pos:"adv.",ex:"Furthermore, the study had a long follow-up.",syn:"moreover",level:"C1",cat:"baglac"},
+{id:208,en:"thus",tr:"böylece, dolayısıyla",pos:"adv.",ex:"The test was negative; thus, no treatment was needed.",syn:"hence",level:"C1",cat:"baglac"},
+{id:209,en:"hence",tr:"bu nedenle",pos:"adv.",ex:"The drug is toxic; hence, careful monitoring is required.",syn:"thus",level:"C1",cat:"baglac"},
+{id:210,en:"consequently",tr:"sonuç olarak, bunun sonucunda",pos:"adv.",ex:"He missed the deadline; consequently, the paper was rejected.",syn:"therefore",level:"C1",cat:"baglac"},
+{id:211,en:"unless",tr:"-medikçe, olmazsa",pos:"conj.",ex:"You will fail unless you study regularly.",syn:"except if",level:"B2",cat:"baglac"},
+{id:212,en:"provided that",tr:"şartıyla, koşuluyla",pos:"conj.",ex:"Surgery is safe provided that the patient is stable.",syn:"as long as",level:"C1",cat:"baglac"},
+{id:213,en:"even though",tr:"öyle olsa bile, -e rağmen",pos:"conj.",ex:"Even though it was late, they continued working.",syn:"although",level:"B2",cat:"baglac"},
+{id:214,en:"as long as",tr:"sürece, -dıkça",pos:"conj.",ex:"You can stay as long as you remain quiet.",syn:"provided that",level:"B2",cat:"baglac"},
+{id:215,en:"in case",tr:"ihtimaline karşı, -irse diye",pos:"conj.",ex:"Take an umbrella in case it rains.",syn:"just in case",level:"B2",cat:"baglac"},
+{id:216,en:"whereby",tr:"ki bu yolla, aracılığıyla",pos:"conj.",ex:"They designed a system whereby errors are reported instantly.",syn:"by which",level:"C1",cat:"baglac"},
+{id:217,en:"albeit",tr:"gerçi, her ne kadar (kısa kullanım)",pos:"conj.",ex:"The effect was positive, albeit small.",syn:"although",level:"C1",cat:"baglac"},
+{id:218,en:"notwithstanding",tr:"-e rağmen (resmî)",pos:"prep.",ex:"Notwithstanding these limitations, the findings are valuable.",syn:"despite",level:"C1",cat:"baglac"},
+{id:219,en:"owing to",tr:"-den dolayı (+ isim)",pos:"prep.",ex:"The flight was delayed owing to bad weather.",syn:"due to",level:"C1",cat:"baglac"},
+{id:220,en:"due to",tr:"-den dolayı (+ isim)",pos:"prep.",ex:"The error was due to a technical fault.",syn:"owing to",level:"B2",cat:"baglac"},
+{id:221,en:"on the contrary",tr:"aksine, tam tersine",pos:"adv.",ex:"He is not lazy; on the contrary, he works very hard.",syn:"quite the opposite",level:"C1",cat:"baglac"},
+{id:222,en:"in contrast",tr:"buna karşılık, tersine",pos:"adv.",ex:"In contrast, the control group showed no change.",syn:"conversely",level:"C1",cat:"baglac"},
+{id:223,en:"similarly",tr:"benzer şekilde",pos:"adv.",ex:"Similarly, the second experiment confirmed the result.",syn:"likewise",level:"B2",cat:"baglac"},
+{id:224,en:"likewise",tr:"aynı şekilde, keza",pos:"adv.",ex:"The staff were friendly; likewise, the service was excellent.",syn:"similarly",level:"C1",cat:"baglac"},
+{id:225,en:"so as to",tr:"-mek için, amacıyla",pos:"conj.",ex:"She left early so as to avoid the traffic.",syn:"in order to",level:"C1",cat:"baglac"},
+/* --- EDAT KALIPLARI --- */
+{id:301,en:"rely on",tr:"güvenmek, bel bağlamak",pos:"v.+prep.",ex:"Clinicians rely on accurate laboratory results.",syn:"depend on",level:"B2",cat:"edat"},
+{id:302,en:"depend on",tr:"bağlı olmak",pos:"v.+prep.",ex:"The outcome depends on early diagnosis.",syn:"rely on",level:"B1",cat:"edat"},
+{id:303,en:"capable of",tr:"yapabilir, muktedir",pos:"adj.+prep.",ex:"The device is capable of measuring tiny changes.",syn:"able to",level:"B2",cat:"edat"},
+{id:304,en:"responsible for",tr:"sorumlu",pos:"adj.+prep.",ex:"This gene is responsible for the disorder.",syn:"in charge of",level:"B2",cat:"edat"},
+{id:305,en:"aware of",tr:"farkında",pos:"adj.+prep.",ex:"Patients should be aware of the side effects.",syn:"conscious of",level:"B2",cat:"edat"},
+{id:306,en:"associated with",tr:"ile ilişkili",pos:"adj.+prep.",ex:"Smoking is associated with lung cancer.",syn:"linked to",level:"B2",cat:"edat"},
+{id:307,en:"related to",tr:"ile ilgili, bağlantılı",pos:"adj.+prep.",ex:"Stress is closely related to sleep quality.",syn:"connected to",level:"B1",cat:"edat"},
+{id:308,en:"familiar with",tr:"aşina, bilen",pos:"adj.+prep.",ex:"Are you familiar with this software?",syn:"acquainted with",level:"B2",cat:"edat"},
+{id:309,en:"accustomed to",tr:"alışkın",pos:"adj.+prep.",ex:"She is accustomed to working night shifts.",syn:"used to",level:"C1",cat:"edat"},
+{id:310,en:"composed of",tr:"-den oluşan",pos:"adj.+prep.",ex:"The committee is composed of ten members.",syn:"made up of",level:"C1",cat:"edat"},
+{id:311,en:"derived from",tr:"-den türetilmiş, elde edilmiş",pos:"adj.+prep.",ex:"This drug is derived from a natural compound.",syn:"originating from",level:"C1",cat:"edat"},
+{id:312,en:"exposed to",tr:"maruz kalmış",pos:"adj.+prep.",ex:"Workers exposed to noise may lose hearing.",syn:"subjected to",level:"B2",cat:"edat"},
+{id:313,en:"prone to",tr:"eğilimli, yatkın",pos:"adj.+prep.",ex:"Elderly patients are prone to falls.",syn:"susceptible to",level:"C1",cat:"edat"},
+{id:314,en:"subject to",tr:"tabi, maruz",pos:"adj.+prep.",ex:"All results are subject to review.",syn:"liable to",level:"C1",cat:"edat"},
+{id:315,en:"contribute to",tr:"katkıda bulunmak",pos:"v.+prep.",ex:"Poor diet contributes to heart disease.",syn:"add to",level:"B2",cat:"edat"},
+{id:316,en:"lead to",tr:"yol açmak",pos:"v.+prep.",ex:"Untreated infection can lead to sepsis.",syn:"result in",level:"B1",cat:"edat"},
+{id:317,en:"result in",tr:"ile sonuçlanmak",pos:"v.+prep.",ex:"The delay resulted in higher costs.",syn:"lead to",level:"B2",cat:"edat"},
+{id:318,en:"result from",tr:"-den kaynaklanmak",pos:"v.+prep.",ex:"The injury resulted from a traffic accident.",syn:"stem from",level:"B2",cat:"edat"},
+{id:319,en:"suffer from",tr:"-den muzdarip olmak",pos:"v.+prep.",ex:"He suffers from chronic pain.",syn:"be afflicted with",level:"B1",cat:"edat"},
+{id:320,en:"consist of",tr:"-den oluşmak",pos:"v.+prep.",ex:"The exam consists of eighty questions.",syn:"be made up of",level:"B1",cat:"edat"},
+{id:321,en:"comply with",tr:"uymak, riayet etmek",pos:"v.+prep.",ex:"All hospitals must comply with safety regulations.",syn:"conform to",level:"C1",cat:"edat"},
+{id:322,en:"cope with",tr:"başa çıkmak",pos:"v.+prep.",ex:"She learned to cope with exam stress.",syn:"deal with",level:"B2",cat:"edat"},
+{id:323,en:"deal with",tr:"ilgilenmek, ele almak",pos:"v.+prep.",ex:"This chapter deals with study design.",syn:"cope with",level:"B1",cat:"edat"},
+{id:324,en:"interfere with",tr:"engellemek, karışmak",pos:"v.+prep.",ex:"Noise can interfere with concentration.",syn:"disrupt",level:"C1",cat:"edat"},
+{id:325,en:"participate in",tr:"katılmak",pos:"v.+prep.",ex:"Fifty patients participated in the trial.",syn:"take part in",level:"B2",cat:"edat"},
+{id:326,en:"engage in",tr:"meşgul olmak, katılmak",pos:"v.+prep.",ex:"Students should engage in regular exercise.",syn:"take part in",level:"C1",cat:"edat"},
+{id:327,en:"succeed in",tr:"başarmak",pos:"v.+prep.",ex:"They succeeded in reducing waiting times.",syn:"manage to",level:"B2",cat:"edat"},
+{id:328,en:"insist on",tr:"ısrar etmek",pos:"v.+prep.",ex:"He insisted on paying the bill.",syn:"persist in",level:"B2",cat:"edat"},
+{id:329,en:"concentrate on",tr:"yoğunlaşmak",pos:"v.+prep.",ex:"Concentrate on the main findings.",syn:"focus on",level:"B1",cat:"edat"},
+{id:330,en:"apply for",tr:"başvurmak",pos:"v.+prep.",ex:"She applied for a research grant.",syn:"seek",level:"B1",cat:"edat"},
+{id:331,en:"account for",tr:"açıklamak; oluşturmak (oran)",pos:"v.+prep.",ex:"Infections account for a third of admissions.",syn:"explain",level:"C1",cat:"edat"},
+{id:332,en:"search for",tr:"aramak",pos:"v.+prep.",ex:"Researchers searched for relevant studies.",syn:"look for",level:"B1",cat:"edat"},
+{id:333,en:"compensate for",tr:"telafi etmek",pos:"v.+prep.",ex:"Nothing can compensate for lost time.",syn:"make up for",level:"C1",cat:"edat"},
+{id:334,en:"blame for",tr:"suçlamak",pos:"v.+prep.",ex:"Don't blame yourself for the mistake.",syn:"hold responsible for",level:"B2",cat:"edat"},
+{id:335,en:"approve of",tr:"onaylamak, uygun bulmak",pos:"v.+prep.",ex:"Her parents approved of the decision.",syn:"endorse",level:"B2",cat:"edat"},
+/* --- PHRASAL VERBS --- */
+{id:401,en:"carry out",tr:"yürütmek, gerçekleştirmek",pos:"phr.v.",ex:"They carried out a randomized trial.",syn:"conduct, perform",level:"B2",cat:"phrasal"},
+{id:402,en:"find out",tr:"öğrenmek, ortaya çıkarmak",pos:"phr.v.",ex:"We need to find out the cause.",syn:"discover",level:"B1",cat:"phrasal"},
+{id:403,en:"figure out",tr:"çözmek, anlamak",pos:"phr.v.",ex:"I can't figure out this formula.",syn:"understand, solve",level:"B2",cat:"phrasal"},
+{id:404,en:"point out",tr:"belirtmek, işaret etmek",pos:"phr.v.",ex:"The reviewer pointed out a major flaw.",syn:"indicate, note",level:"B2",cat:"phrasal"},
+{id:405,en:"rule out",tr:"dışlamak, olasılık dışı bırakmak",pos:"phr.v.",ex:"The scan ruled out a fracture.",syn:"exclude, eliminate",level:"C1",cat:"phrasal"},
+{id:406,en:"turn out",tr:"ortaya çıkmak, sonuçlanmak",pos:"phr.v.",ex:"The rumor turned out to be true.",syn:"prove to be",level:"B2",cat:"phrasal"},
+{id:407,en:"work out",tr:"çözmek; işe yaramak",pos:"phr.v.",ex:"The plan worked out perfectly.",syn:"solve, succeed",level:"B2",cat:"phrasal"},
+{id:408,en:"bring about",tr:"yol açmak, meydana getirmek",pos:"phr.v.",ex:"The reform brought about major changes.",syn:"cause, produce",level:"C1",cat:"phrasal"},
+{id:409,en:"come about",tr:"meydana gelmek",pos:"phr.v.",ex:"How did this situation come about?",syn:"happen, occur",level:"C1",cat:"phrasal"},
+{id:410,en:"set about",tr:"başlamak, girişmek",pos:"phr.v.",ex:"She set about revising the manuscript.",syn:"begin, start",level:"C1",cat:"phrasal"},
+{id:411,en:"take over",tr:"devralmak",pos:"phr.v.",ex:"A new director took over the department.",syn:"assume control of",level:"B2",cat:"phrasal"},
+{id:412,en:"take up",tr:"başlamak (hobi); yer kaplamak",pos:"phr.v.",ex:"He took up swimming last year.",syn:"start, occupy",level:"B2",cat:"phrasal"},
+{id:413,en:"give up",tr:"bırakmak, vazgeçmek",pos:"phr.v.",ex:"She gave up smoking two years ago.",syn:"quit, abandon",level:"B1",cat:"phrasal"},
+{id:414,en:"make up",tr:"oluşturmak; uydurmak",pos:"phr.v.",ex:"Women make up sixty percent of the sample.",syn:"constitute, invent",level:"B2",cat:"phrasal"},
+{id:415,en:"make up for",tr:"telafi etmek",pos:"phr.v.",ex:"Hard work made up for his lack of experience.",syn:"compensate for",level:"C1",cat:"phrasal"},
+{id:416,en:"put off",tr:"ertelemek",pos:"phr.v.",ex:"They put off the meeting until Monday.",syn:"postpone, delay",level:"B2",cat:"phrasal"},
+{id:417,en:"put up with",tr:"katlanmak, tahammül etmek",pos:"phr.v.",ex:"I can't put up with this noise.",syn:"tolerate, endure",level:"C1",cat:"phrasal"},
+{id:418,en:"look after",tr:"bakmak, ilgilenmek",pos:"phr.v.",ex:"She looks after her elderly mother.",syn:"take care of",level:"B1",cat:"phrasal"},
+{id:419,en:"look into",tr:"araştırmak, incelemek",pos:"phr.v.",ex:"The committee will look into the complaint.",syn:"investigate, examine",level:"B2",cat:"phrasal"},
+{id:420,en:"look forward to",tr:"sabırsızlıkla beklemek",pos:"phr.v.",ex:"We look forward to your reply.",syn:"anticipate",level:"B1",cat:"phrasal"},
+{id:421,en:"break down",tr:"bozulmak; (görüşme) çökmek",pos:"phr.v.",ex:"Negotiations broke down after two days.",syn:"fail, collapse",level:"B2",cat:"phrasal"},
+{id:422,en:"break out",tr:"patlak vermek (savaş, salgın)",pos:"phr.v.",ex:"An epidemic broke out in the region.",syn:"erupt, start suddenly",level:"C1",cat:"phrasal"},
+{id:423,en:"come across",tr:"rastlamak, denk gelmek",pos:"phr.v.",ex:"I came across an interesting article.",syn:"encounter, find by chance",level:"B2",cat:"phrasal"},
+{id:424,en:"come up with",tr:"bulmak, ortaya atmak (fikir)",pos:"phr.v.",ex:"She came up with a brilliant solution.",syn:"devise, propose",level:"B2",cat:"phrasal"},
+{id:425,en:"cut down on",tr:"azaltmak (tüketim)",pos:"phr.v.",ex:"You should cut down on caffeine.",syn:"reduce",level:"B2",cat:"phrasal"},
+{id:426,en:"do away with",tr:"ortadan kaldırmak",pos:"phr.v.",ex:"The new law did away with old restrictions.",syn:"abolish, eliminate",level:"C1",cat:"phrasal"},
+{id:427,en:"get over",tr:"atlatmak, üstesinden gelmek",pos:"phr.v.",ex:"It took weeks to get over the flu.",syn:"recover from",level:"B2",cat:"phrasal"},
+{id:428,en:"get rid of",tr:"kurtulmak",pos:"phr.v.",ex:"We must get rid of unnecessary paperwork.",syn:"eliminate, remove",level:"B1",cat:"phrasal"},
+{id:429,en:"go through",tr:"geçirmek, yaşamak; gözden geçirmek",pos:"phr.v.",ex:"The country went through a severe crisis.",syn:"experience, examine",level:"B2",cat:"phrasal"},
+{id:430,en:"keep up with",tr:"ayak uydurmak, takip etmek",pos:"phr.v.",ex:"It is hard to keep up with the literature.",syn:"stay level with",level:"B2",cat:"phrasal"},
+{id:431,en:"pull through",tr:"(hastalığı) atlatmak, kurtulmak",pos:"phr.v.",ex:"The patient was critical but pulled through.",syn:"survive, recover",level:"C1",cat:"phrasal"},
+{id:432,en:"run out of",tr:"tükenmek, bitirmek",pos:"phr.v.",ex:"We ran out of time during the exam.",syn:"exhaust, use up",level:"B1",cat:"phrasal"},
+{id:433,en:"set up",tr:"kurmak",pos:"phr.v.",ex:"They set up a new laboratory.",syn:"establish, found",level:"B1",cat:"phrasal"},
+{id:434,en:"sort out",tr:"halletmek, düzene sokmak",pos:"phr.v.",ex:"We need to sort out this problem quickly.",syn:"resolve, organize",level:"B2",cat:"phrasal"},
+{id:435,en:"stand for",tr:"temsil etmek, anlamına gelmek",pos:"phr.v.",ex:"What does ECG stand for?",syn:"represent, mean",level:"B2",cat:"phrasal"},
+{id:436,en:"take after",tr:"(aile büyüğüne) benzemek",pos:"phr.v.",ex:"She takes after her mother.",syn:"resemble",level:"B2",cat:"phrasal"},
+{id:437,en:"take into account",tr:"hesaba katmak",pos:"phr.v.",ex:"The model takes age into account.",syn:"consider",level:"C1",cat:"phrasal"},
+{id:438,en:"turn down",tr:"reddetmek; kısmak",pos:"phr.v.",ex:"He turned down the job offer.",syn:"reject, refuse",level:"B2",cat:"phrasal"},
+{id:439,en:"wear off",tr:"etkisi geçmek",pos:"phr.v.",ex:"The anesthesia wore off after an hour.",syn:"fade, diminish",level:"C1",cat:"phrasal"},
+{id:440,en:"hold on",tr:"beklemek; sıkı tutunmak",pos:"phr.v.",ex:"Hold on, I will check the records.",syn:"wait",level:"B1",cat:"phrasal"},
+/* --- AKADEMİK KELİMELER --- */
+{id:501,en:"significant",tr:"önemli, anlamlı",pos:"adj.",ex:"The difference was statistically significant.",syn:"important, notable",level:"B2",cat:"akademik"},
+{id:502,en:"substantial",tr:"önemli miktarda, hatırı sayılır",pos:"adj.",ex:"A substantial number of patients improved.",syn:"considerable, sizeable",level:"C1",cat:"akademik"},
+{id:503,en:"considerable",tr:"kayda değer, epeyce",pos:"adj.",ex:"The project required considerable effort.",syn:"substantial, significant",level:"B2",cat:"akademik"},
+{id:504,en:"crucial",tr:"çok önemli, kritik",pos:"adj.",ex:"Early diagnosis is crucial for survival.",syn:"vital, critical",level:"B2",cat:"akademik"},
+{id:505,en:"essential",tr:"zorunlu, temel",pos:"adj.",ex:"Sleep is essential for memory.",syn:"vital, indispensable",level:"B2",cat:"akademik"},
+{id:506,en:"adequate",tr:"yeterli",pos:"adj.",ex:"The sample size was adequate for analysis.",syn:"sufficient, enough",level:"C1",cat:"akademik"},
+{id:507,en:"sufficient",tr:"yeterli, kâfi",pos:"adj.",ex:"There is sufficient evidence to conclude.",syn:"adequate, ample",level:"B2",cat:"akademik"},
+{id:508,en:"abundant",tr:"bol, çok",pos:"adj.",ex:"The region has abundant natural resources.",syn:"plentiful, ample",level:"C1",cat:"akademik"},
+{id:509,en:"scarce",tr:"kıt, az bulunan",pos:"adj.",ex:"Reliable data on this topic are scarce.",syn:"rare, limited",level:"C1",cat:"akademik"},
+{id:510,en:"prevalent",tr:"yaygın, hüküm süren",pos:"adj.",ex:"Obesity is increasingly prevalent worldwide.",syn:"widespread, common",level:"C1",cat:"akademik"},
+{id:511,en:"widespread",tr:"yaygın",pos:"adj.",ex:"The practice is widespread among students.",syn:"prevalent, extensive",level:"B2",cat:"akademik"},
+{id:512,en:"inevitable",tr:"kaçınılmaz",pos:"adj.",ex:"Some degree of error is inevitable.",syn:"unavoidable, certain",level:"C1",cat:"akademik"},
+{id:513,en:"feasible",tr:"uygulanabilir, yapılabilir",pos:"adj.",ex:"The plan is technically feasible.",syn:"practicable, viable",level:"C1",cat:"akademik"},
+{id:514,en:"viable",tr:"yaşayabilir, uygulanabilir",pos:"adj.",ex:"Solar power is a viable alternative.",syn:"feasible, workable",level:"C1",cat:"akademik"},
+{id:515,en:"ambiguous",tr:"belirsiz, muğlak",pos:"adj.",ex:"The question was ambiguous and confusing.",syn:"unclear, vague",level:"C1",cat:"akademik"},
+{id:516,en:"explicit",tr:"açık, sarih",pos:"adj.",ex:"The instructions were explicit and detailed.",syn:"clear, direct",level:"C1",cat:"akademik"},
+{id:517,en:"implicit",tr:"örtük, ima edilen",pos:"adj.",ex:"There was an implicit warning in his words.",syn:"implied, unstated",level:"C1",cat:"akademik"},
+{id:518,en:"coherent",tr:"tutarlı, bağdaşık",pos:"adj.",ex:"She presented a coherent argument.",syn:"logical, consistent",level:"C1",cat:"akademik"},
+{id:519,en:"consistent",tr:"tutarlı, istikrarlı",pos:"adj.",ex:"The results were consistent across centers.",syn:"steady, uniform",level:"B2",cat:"akademik"},
+{id:520,en:"comprehensive",tr:"kapsamlı",pos:"adj.",ex:"They performed a comprehensive review.",syn:"thorough, extensive",level:"B2",cat:"akademik"},
+{id:521,en:"thorough",tr:"titiz, ayrıntılı",pos:"adj.",ex:"A thorough examination revealed the cause.",syn:"detailed, meticulous",level:"C1",cat:"akademik"},
+{id:522,en:"subsequent",tr:"sonraki, müteakip",pos:"adj.",ex:"Subsequent studies confirmed the finding.",syn:"following, later",level:"C1",cat:"akademik"},
+{id:523,en:"preliminary",tr:"ön, başlangıç niteliğinde",pos:"adj.",ex:"These are only preliminary results.",syn:"initial, early",level:"C1",cat:"akademik"},
+{id:524,en:"ultimate",tr:"nihai, son",pos:"adj.",ex:"The ultimate goal is full recovery.",syn:"final, eventual",level:"B2",cat:"akademik"},
+{id:525,en:"contemporary",tr:"çağdaş, güncel",pos:"adj.",ex:"Contemporary medicine relies on evidence.",syn:"modern, current",level:"C1",cat:"akademik"},
+{id:526,en:"conventional",tr:"geleneksel, alışılagelmiş",pos:"adj.",ex:"Conventional therapy failed in these cases.",syn:"traditional, standard",level:"C1",cat:"akademik"},
+{id:527,en:"novel",tr:"yeni, özgün",pos:"adj.",ex:"They proposed a novel approach.",syn:"new, original",level:"C1",cat:"akademik"},
+{id:528,en:"obsolete",tr:"kullanımdan kalkmış, modası geçmiş",pos:"adj.",ex:"The technique is now obsolete.",syn:"outdated, disused",level:"C1",cat:"akademik"},
+{id:529,en:"deteriorate",tr:"kötüleşmek",pos:"v.",ex:"His condition deteriorated overnight.",syn:"worsen, decline",level:"C1",cat:"akademik"},
+{id:530,en:"enhance",tr:"artırmak, iyileştirmek",pos:"v.",ex:"Exercise enhances cognitive function.",syn:"improve, boost",level:"B2",cat:"akademik"},
+{id:531,en:"facilitate",tr:"kolaylaştırmak",pos:"v.",ex:"Technology facilitates data collection.",syn:"ease, enable",level:"C1",cat:"akademik"},
+{id:532,en:"hinder",tr:"engellemek, aksatmak",pos:"v.",ex:"Bureaucracy hinders innovation.",syn:"impede, obstruct",level:"C1",cat:"akademik"},
+{id:533,en:"impede",tr:"engellemek, sekteye uğratmak",pos:"v.",ex:"Heavy rain impeded the rescue efforts.",syn:"hinder, hamper",level:"C1",cat:"akademik"},
+{id:534,en:"mitigate",tr:"hafifletmek, azaltmak",pos:"v.",ex:"Vaccination mitigates the risk of severe disease.",syn:"alleviate, lessen",level:"C1",cat:"akademik"},
+{id:535,en:"alleviate",tr:"hafifletmek (ağrı, sorun)",pos:"v.",ex:"The drug alleviates chronic pain.",syn:"relieve, ease",level:"C1",cat:"akademik"},
+{id:536,en:"exacerbate",tr:"şiddetlendirmek, kötüleştirmek",pos:"v.",ex:"Stress can exacerbate the symptoms.",syn:"worsen, aggravate",level:"C1",cat:"akademik"},
+{id:537,en:"eliminate",tr:"ortadan kaldırmak",pos:"v.",ex:"The program aims to eliminate measles.",syn:"remove, eradicate",level:"B2",cat:"akademik"},
+{id:538,en:"diminish",tr:"azalmak, azaltmak",pos:"v.",ex:"The effect diminished over time.",syn:"decrease, lessen",level:"C1",cat:"akademik"},
+{id:539,en:"accumulate",tr:"birikmek, biriktirmek",pos:"v.",ex:"Evidence has accumulated over decades.",syn:"build up, gather",level:"C1",cat:"akademik"},
+{id:540,en:"allocate",tr:"tahsis etmek, ayırmak",pos:"v.",ex:"Patients were randomly allocated to groups.",syn:"assign, distribute",level:"C1",cat:"akademik"},
+{id:541,en:"assess",tr:"değerlendirmek",pos:"v.",ex:"We assessed the diagnostic accuracy.",syn:"evaluate, appraise",level:"B2",cat:"akademik"},
+{id:542,en:"evaluate",tr:"değerlendirmek, ölçmek",pos:"v.",ex:"The committee evaluated all applications.",syn:"assess, judge",level:"B2",cat:"akademik"},
+{id:543,en:"demonstrate",tr:"göstermek, kanıtlamak",pos:"v.",ex:"The trial demonstrated a clear benefit.",syn:"show, prove",level:"B2",cat:"akademik"},
+{id:544,en:"indicate",tr:"göstermek, işaret etmek",pos:"v.",ex:"The findings indicate a strong association.",syn:"show, suggest",level:"B2",cat:"akademik"},
+{id:545,en:"imply",tr:"ima etmek, anlamına gelmek",pos:"v.",ex:"Correlation does not imply causation.",syn:"suggest, indicate indirectly",level:"C1",cat:"akademik"},
+{id:546,en:"infer",tr:"çıkarım yapmak",pos:"v.",ex:"We can infer the cause from the data.",syn:"deduce, conclude",level:"C1",cat:"akademik"},
+{id:547,en:"assert",tr:"iddia etmek, öne sürmek",pos:"v.",ex:"The author asserts that the model is superior.",syn:"claim, maintain",level:"C1",cat:"akademik"},
+{id:548,en:"advocate",tr:"savunmak",pos:"v.",ex:"Experts advocate early screening.",syn:"support, champion",level:"C1",cat:"akademik"},
+{id:549,en:"acknowledge",tr:"kabul etmek, teslim etmek",pos:"v.",ex:"The authors acknowledged the limitations.",syn:"admit, recognize",level:"C1",cat:"akademik"},
+{id:550,en:"attribute",tr:"atfetmek, bağlamak",pos:"v.",ex:"The improvement was attributed to the new drug.",syn:"ascribe, credit",level:"C1",cat:"akademik"},
+{id:551,en:"cite",tr:"alıntılamak, atıf yapmak",pos:"v.",ex:"The paper has been cited over a hundred times.",syn:"quote, reference",level:"C1",cat:"akademik"},
+{id:552,en:"comprise",tr:"içermek, kapsamak",pos:"v.",ex:"The cohort comprised 46 infants.",syn:"consist of, include",level:"C1",cat:"akademik"},
+{id:553,en:"constitute",tr:"oluşturmak, teşkil etmek",pos:"v.",ex:"Women constitute half of the workforce.",syn:"form, make up",level:"C1",cat:"akademik"},
+{id:554,en:"denote",tr:"belirtmek, göstermek",pos:"v.",ex:"The asterisk denotes statistical significance.",syn:"indicate, signify",level:"C1",cat:"akademik"},
+{id:555,en:"emerge",tr:"ortaya çıkmak",pos:"v.",ex:"A clear pattern emerged from the data.",syn:"appear, arise",level:"B2",cat:"akademik"},
+{id:556,en:"emphasize",tr:"vurgulamak",pos:"v.",ex:"The guideline emphasizes early treatment.",syn:"stress, highlight",level:"B2",cat:"akademik"},
+{id:557,en:"establish",tr:"kurmak; ortaya koymak",pos:"v.",ex:"The study established a causal link.",syn:"prove, set up",level:"B2",cat:"akademik"},
+{id:558,en:"exceed",tr:"aşmak, geçmek",pos:"v.",ex:"Costs exceeded the initial budget.",syn:"surpass, go beyond",level:"C1",cat:"akademik"},
+{id:559,en:"exhibit",tr:"sergilemek, göstermek",pos:"v.",ex:"Patients exhibited similar symptoms.",syn:"display, show",level:"C1",cat:"akademik"},
+{id:560,en:"exploit",tr:"kullanmak, yararlanmak; sömürmek",pos:"v.",ex:"The method exploits machine learning.",syn:"utilize, take advantage of",level:"C1",cat:"akademik"},
+{id:561,en:"foster",tr:"teşvik etmek, beslemek",pos:"v.",ex:"Mentorship fosters academic growth.",syn:"promote, encourage",level:"C1",cat:"akademik"},
+{id:562,en:"generate",tr:"üretmek, oluşturmak",pos:"v.",ex:"The survey generated valuable data.",syn:"produce, create",level:"B2",cat:"akademik"},
+{id:563,en:"implement",tr:"uygulamak, hayata geçirmek",pos:"v.",ex:"The hospital implemented a new protocol.",syn:"apply, execute",level:"C1",cat:"akademik"},
+{id:564,en:"incorporate",tr:"dahil etmek, bünyesine katmak",pos:"v.",ex:"The model incorporates age and sex.",syn:"include, integrate",level:"C1",cat:"akademik"},
+{id:565,en:"induce",tr:"neden olmak, tetiklemek",pos:"v.",ex:"The drug may induce drowsiness.",syn:"cause, bring about",level:"C1",cat:"akademik"},
+{id:566,en:"undergo",tr:"geçirmek, maruz kalmak",pos:"v.",ex:"All patients underwent surgery.",syn:"experience, go through",level:"C1",cat:"akademik"},
+{id:567,en:"undermine",tr:"baltalamak, zayıflatmak",pos:"v.",ex:"Bias can undermine the validity of a study.",syn:"weaken, erode",level:"C1",cat:"akademik"},
+{id:568,en:"sustain",tr:"sürdürmek; (yaralanma) geçirmek",pos:"v.",ex:"The patient sustained multiple injuries.",syn:"maintain, suffer",level:"C1",cat:"akademik"},
+{id:569,en:"retain",tr:"korumak, elde tutmak",pos:"v.",ex:"The brain retains new words through repetition.",syn:"keep, preserve",level:"C1",cat:"akademik"},
+{id:570,en:"yield",tr:"vermek, sağlamak (sonuç)",pos:"v.",ex:"The analysis yielded surprising results.",syn:"produce, provide",level:"C1",cat:"akademik"},
+{id:571,en:"trigger",tr:"tetiklemek",pos:"v.",ex:"Allergens can trigger an asthma attack.",syn:"provoke, set off",level:"B2",cat:"akademik"},
+{id:572,en:"perceive",tr:"algılamak",pos:"v.",ex:"Patients perceived the treatment as helpful.",syn:"see, regard",level:"C1",cat:"akademik"},
+{id:573,en:"presume",tr:"varsaymak, farz etmek",pos:"v.",ex:"The cause was presumed to be viral.",syn:"assume, suppose",level:"C1",cat:"akademik"},
+{id:574,en:"speculate",tr:"tahmin yürütmek",pos:"v.",ex:"We can only speculate about the mechanism.",syn:"guess, theorize",level:"C1",cat:"akademik"},
+{id:575,en:"verify",tr:"doğrulamak",pos:"v.",ex:"An independent team verified the results.",syn:"confirm, validate",level:"C1",cat:"akademik"},
+{id:576,en:"fluctuate",tr:"dalgalanmak",pos:"v.",ex:"Blood pressure fluctuates during the day.",syn:"vary, oscillate",level:"C1",cat:"akademik"},
+{id:577,en:"deduce",tr:"sonuç çıkarmak",pos:"v.",ex:"We deduced the diagnosis from the findings.",syn:"infer, conclude",level:"C1",cat:"akademik"},
+{id:578,en:"anticipate",tr:"öngörmek, beklemek",pos:"v.",ex:"We anticipate a high response rate.",syn:"expect, foresee",level:"C1",cat:"akademik"},
+{id:579,en:"compile",tr:"derlemek",pos:"v.",ex:"The authors compiled data from ten centers.",syn:"gather, assemble",level:"C1",cat:"akademik"},
+{id:580,en:"reluctant",tr:"isteksiz, gönülsüz",pos:"adj.",ex:"Patients were reluctant to report side effects.",syn:"unwilling, hesitant",level:"C1",cat:"akademik"},
+/* --- DEFTERİM (el yazısı notlardan) --- */
+{id:701,en:"erode",tr:"aşındırmak, aşınmak",pos:"v.",ex:"Coastal cliffs are gradually eroded by wave action.",syn:"wear away",ex2:"Continuous erosion has eroded much of the topsoil in the region.",exTr2:"Bölgedeki üst toprağın büyük kısmı sürekli erozyonla aşındı.",ex3:"Public trust in the institution eroded steadily after the scandal.",exTr3:"Skandaldan sonra kuruma olan kamu güveni giderek aşındı.",level:"C1",cat:"defter"},
+{id:702,en:"excavate",tr:"kazmak, kazı yapmak",pos:"v.",ex:"Archaeologists excavated the site over two decades.",syn:"dig up, unearth",ex2:"Workers excavated the foundation before construction began.",exTr2:"İnşaat başlamadan önce işçiler temeli kazdı.",ex3:"The ancient tomb was carefully excavated by a team of archaeologists.",exTr3:"Antik mezar bir arkeolog ekibi tarafından dikkatle kazıldı.",level:"C1",cat:"defter"},
+{id:703,en:"populate",tr:"yerleşmek, iskân etmek",pos:"v.",ex:"The region was first populated by nomadic tribes.",syn:"inhabit, settle",ex2:"Early settlers populated the fertile valley centuries ago.",exTr2:"İlk yerleşimciler yüzyıllar önce verimli vadiye yerleşti.",ex3:"Robots may soon populate factory floors previously run by humans.",exTr3:"Robotlar yakında daha önce insanların çalıştırdığı fabrika katlarına yerleşebilir.",level:"C1",cat:"defter"},
+{id:704,en:"renovate",tr:"yenilemek",pos:"v.",ex:"The historic building was renovated to serve as a museum.",syn:"restore, refurbish",ex2:"The old theatre was renovated to attract more visitors.",exTr2:"Eski tiyatro daha fazla ziyaretçi çekmek için yenilendi.",ex3:"They plan to renovate the hospital wing next year.",exTr3:"Gelecek yıl hastane koğuşunu yenilemeyi planlıyorlar.",level:"C1",cat:"defter"},
+{id:705,en:"regulate",tr:"düzenlemek, denetlemek",pos:"v.",ex:"New legislation regulates the use of artificial intelligence in medicine.",syn:"control, govern",ex2:"A hormone helps regulate blood sugar levels in the body.",exTr2:"Bir hormon vücuttaki kan şekeri seviyelerini düzenlemeye yardımcı olur.",ex3:"Governments regulate air traffic to ensure passenger safety.",exTr3:"Hükümetler yolcu güvenliğini sağlamak için hava trafiğini denetler.",level:"B2",cat:"defter"},
+{id:706,en:"dissipate",tr:"dağılmak, yayılıp kaybolmak",pos:"v.",ex:"Public enthusiasm for the reform dissipated within a few months.",syn:"disperse, fade",ex2:"The morning fog dissipated as the sun rose.",exTr2:"Güneş doğarken sabah sisi dağıldı.",ex3:"His anger dissipated once he understood the misunderstanding.",exTr3:"Yanlış anlaşılmayı anlayınca öfkesi dağıldı.",level:"C1",cat:"defter"},
+{id:707,en:"participate",tr:"katılmak",pos:"v.",ex:"Over 200 hospitals participated in the multicenter trial.",syn:"take part",ex2:"Students were encouraged to participate in the debate.",exTr2:"Öğrenciler tartışmaya katılmaya teşvik edildi.",ex3:"Only a few countries chose to participate in the treaty.",exTr3:"Sadece birkaç ülke anlaşmaya katılmayı seçti.",level:"B2",cat:"defter"},
+{id:708,en:"condense",tr:"yoğunlaştırmak, özetlemek",pos:"v.",ex:"The findings were condensed into a single summary table.",syn:"compress, summarize",ex2:"The report condenses years of research into a few pages.",exTr2:"Rapor, yılların araştırmasını birkaç sayfaya yoğunlaştırıyor.",ex3:"Steam condenses into water when it touches a cold surface.",exTr3:"Buhar soğuk bir yüzeye değince suya yoğunlaşır.",level:"C1",cat:"defter"},
+{id:709,en:"predict",tr:"tahmin etmek, öngörmek",pos:"v.",ex:"The model accurately predicts mortality in septic patients.",syn:"forecast, foresee",ex2:"Meteorologists predicted heavy rainfall for the weekend.",exTr2:"Meteorologlar hafta sonu için şiddetli yağış tahmin etti.",ex3:"It is difficult to predict how the market will react.",exTr3:"Piyasanın nasıl tepki vereceğini tahmin etmek zor.",level:"B2",cat:"defter"},
+{id:710,en:"restrict",tr:"sınırlandırmak, kısıtlamak",pos:"v.",ex:"Access to the data was restricted to authorized researchers.",syn:"limit, confine",ex2:"New rules restrict the use of plastic bags in the city.",exTr2:"Yeni kurallar şehirde plastik torba kullanımını sınırlandırıyor.",ex3:"Doctors restricted his diet after the surgery.",exTr3:"Doktorlar ameliyattan sonra diyetini sınırlandırdı.",level:"B2",cat:"defter"},
+{id:711,en:"strive",tr:"çabalamak, uğraşmak",pos:"v.",ex:"Scientists strive to develop more effective vaccines.",syn:"endeavor, struggle",ex2:"She strives to balance her career and family life.",exTr2:"Kariyerini ve aile hayatını dengelemeye çabalıyor.",ex3:"The team strove to meet the tight deadline.",exTr3:"Ekip sıkı teslim tarihine yetişmek için çabaladı.",level:"C1",cat:"defter"},
+{id:712,en:"approve",tr:"onaylamak",pos:"v.",ex:"The ethics committee approved the study protocol.",syn:"authorize, endorse",ex2:"The board approved the new budget unanimously.",exTr2:"Yönetim kurulu yeni bütçeyi oy birliğiyle onayladı.",ex3:"Parents must approve the trip before their child can join.",exTr3:"Çocuklarının geziye katılabilmesi için ebeveynlerin onaylaması gerekir.",level:"B2",cat:"defter"},
+{id:713,en:"commit",tr:"işlemek (suç); taahhüt etmek",pos:"v.",ex:"The government committed substantial funds to cancer research.",syn:"pledge, devote",ex2:"She committed herself fully to the research project.",exTr2:"Kendini araştırma projesine tamamen adadı.",ex3:"The company committed additional funds to employee training.",exTr3:"Şirket çalışan eğitimine ek kaynak ayırdı.",level:"C1",cat:"defter"},
+{id:714,en:"resist",tr:"karşı koymak, direnmek",pos:"v.",ex:"Some bacteria have evolved to resist multiple antibiotics.",syn:"withstand, oppose",ex2:"The old bridge was built to resist strong earthquakes.",exTr2:"Eski köprü güçlü depremlere dayanacak şekilde inşa edildi.",ex3:"He resisted the temptation to give up.",exTr3:"Vazgeçme dürtüsüne direndi.",level:"B2",cat:"defter"},
+{id:715,en:"refrain",tr:"kaçınmak, geri durmak (from)",pos:"v.",ex:"Patients were asked to refrain from eating before the test.",syn:"abstain, avoid",ex2:"Visitors are asked to refrain from touching the artwork.",exTr2:"Ziyaretçilerden sanat eserlerine dokunmaktan kaçınmaları isteniyor.",ex3:"She refrained from commenting until she had all the facts.",exTr3:"Tüm gerçekleri öğrenene kadar yorum yapmaktan kaçındı.",level:"C1",cat:"defter"},
+{id:716,en:"disregard",tr:"göz ardı etmek",pos:"v.",ex:"Ignoring safety warnings means disregarding scientific consensus.",syn:"ignore, overlook",ex2:"The driver disregarded the warning signs completely.",exTr2:"Sürücü uyarı işaretlerini tamamen göz ardı etti.",ex3:"Critics say the policy disregards the needs of rural areas.",exTr3:"Eleştirmenler, politikanın kırsal bölgelerin ihtiyaçlarını göz ardı ettiğini söylüyor.",level:"C1",cat:"defter"},
+{id:717,en:"dismiss",tr:"reddetmek; işten çıkarmak",pos:"v.",ex:"Early critics dismissed the theory as speculative.",syn:"reject, discard",ex2:"The judge dismissed the case due to lack of evidence.",exTr2:"Hâkim, kanıt yetersizliğinden davayı reddetti.",ex3:"He dismissed the idea as impractical.",exTr3:"Fikri pratik olmadığı gerekçesiyle reddetti.",level:"C1",cat:"defter"},
+{id:718,en:"impair",tr:"bozmak, zayıflatmak",pos:"v.",ex:"Sleep deprivation significantly impairs cognitive performance.",syn:"weaken, damage",ex2:"Lack of sleep can impair concentration and memory.",exTr2:"Uykusuzluk konsantrasyonu ve hafızayı bozabilir.",ex3:"The injury impaired his ability to walk without assistance.",exTr3:"Yaralanma, yardımsız yürüme yeteneğini bozdu.",level:"C1",cat:"defter"},
+{id:719,en:"confirm",tr:"doğrulamak",pos:"v.",ex:"Subsequent experiments confirmed the initial hypothesis.",syn:"verify, validate",ex2:"Lab tests confirmed the initial diagnosis.",exTr2:"Laboratuvar testleri ilk teşhisi doğruladı.",ex3:"Please confirm your attendance by Friday.",exTr3:"Lütfen katılımınızı cumaya kadar teyit edin.",level:"B2",cat:"defter"},
+{id:720,en:"distinguish",tr:"ayırt etmek",pos:"v.",ex:"The test cannot distinguish between viral and bacterial infections.",syn:"differentiate",ex2:"It can be hard to distinguish twins at first glance.",exTr2:"İlk bakışta ikizleri ayırt etmek zor olabilir.",ex3:"The test helps distinguish bacterial from viral infections.",exTr3:"Test, bakteriyel enfeksiyonları viral olanlardan ayırt etmeye yardımcı olur.",level:"C1",cat:"defter"},
+{id:721,en:"stipulate",tr:"şart koşmak",pos:"v.",ex:"The contract stipulates that results must be published within a year.",syn:"specify, require",ex2:"The agreement stipulates a minimum notice period of thirty days.",exTr2:"Anlaşma, en az otuz günlük bir bildirim süresi öngörüyor.",ex3:"The law stipulates strict penalties for violations.",exTr3:"Kanun, ihlaller için sıkı cezalar öngörüyor.",level:"C1",cat:"defter"},
+{id:722,en:"undertake",tr:"üstlenmek, girişmek",pos:"v.",ex:"The team undertook a comprehensive review of the literature.",syn:"carry out, assume",ex2:"The city undertook a major renovation of its water system.",exTr2:"Şehir, su sisteminde büyük bir yenileme çalışmasına girişti.",ex3:"She undertook the task without any assistance.",exTr3:"Görevi hiçbir yardım almadan üstlendi.",level:"C1",cat:"defter"},
+{id:723,en:"inhabit",tr:"bir yerde yaşamak",pos:"v.",ex:"These species inhabit the deepest parts of the ocean.",syn:"occupy, dwell in",ex2:"Few animals inhabit this harsh desert environment.",exTr2:"Bu sert çöl ortamında çok az hayvan yaşar.",ex3:"The village has been inhabited for over a thousand years.",exTr3:"Köyde bin yılı aşkın süredir yaşanıyor.",level:"C1",cat:"defter"},
+{id:724,en:"exemplify",tr:"örneklemek, örneği olmak",pos:"v.",ex:"This case exemplifies the challenges of rural healthcare.",syn:"illustrate, typify",ex2:"This painting exemplifies the artist's early style.",exTr2:"Bu tablo, sanatçının erken dönem tarzını örnekliyor.",ex3:"Her dedication exemplifies what it means to be a good teacher.",exTr3:"Onun özverisi, iyi bir öğretmen olmanın ne anlama geldiğini örnekliyor.",level:"C1",cat:"defter"},
+{id:725,en:"execute",tr:"yürütmek, uygulamak",pos:"v.",ex:"The plan was executed precisely as designed.",syn:"carry out, implement",ex2:"The surgical team executed the procedure flawlessly.",exTr2:"Cerrahi ekip prosedürü kusursuzca uyguladı.",ex3:"The company executed its strategy ahead of schedule.",exTr3:"Şirket, stratejisini planlanandan önce hayata geçirdi.",level:"C1",cat:"defter"},
+{id:726,en:"deliver",tr:"teslim etmek; sunmak",pos:"v.",ex:"Telemedicine can deliver specialist care to remote areas.",syn:"provide, convey",ex2:"The company delivers packages within twenty-four hours.",exTr2:"Şirket, paketleri yirmi dört saat içinde teslim ediyor.",ex3:"The professor delivered a compelling lecture on climate change.",exTr3:"Profesör, iklim değişikliği üzerine etkileyici bir ders verdi.",level:"B2",cat:"defter"},
+{id:727,en:"submit",tr:"sunmak, teslim etmek",pos:"v.",ex:"Authors must submit their manuscripts electronically.",syn:"present, hand in",ex2:"Applicants must submit their documents by the deadline.",exTr2:"Başvuranlar belgelerini son tarihe kadar sunmalı.",ex3:"She submitted her resignation after months of consideration.",exTr3:"Aylarca düşündükten sonra istifasını sundu.",level:"B2",cat:"defter"},
+{id:728,en:"enrichment",tr:"zenginleşme, zenginleştirme",pos:"n.",ex:"Cultural enrichment is one benefit of studying abroad.",ex2:"The museum offers enrichment programs for young students.",exTr2:"Müze, genç öğrenciler için zenginleştirme programları sunuyor.",ex3:"Cultural enrichment was one of the trip's main goals.",exTr3:"Kültürel zenginleşme, gezinin ana hedeflerinden biriydi.",level:"C1",cat:"defter"},
+{id:729,en:"association",tr:"ilişki, bağlantı; dernek",pos:"n.",ex:"The study revealed a strong association between diet and longevity.",syn:"link, connection",ex2:"There is a strong association between smoking and lung disease.",exTr2:"Sigara ile akciğer hastalığı arasında güçlü bir ilişki vardır.",ex3:"He is a member of the local medical association.",exTr3:"Yerel tıp derneğinin bir üyesidir.",level:"B2",cat:"defter"},
+{id:730,en:"advent",tr:"ortaya çıkma, geliş",pos:"n.",ex:"The advent of antibiotics transformed modern medicine.",syn:"arrival, emergence",ex2:"Life changed dramatically after the advent of electricity.",exTr2:"Elektriğin ortaya çıkmasından sonra hayat büyük ölçüde değişti.",ex3:"The advent of social media reshaped how people communicate.",exTr3:"Sosyal medyanın ortaya çıkışı, insanların iletişim şeklini yeniden şekillendirdi.",level:"C1",cat:"defter"},
+{id:731,en:"resentment",tr:"gücenme, içerleme",pos:"n.",ex:"Unequal pay caused deep resentment among the staff.",syn:"bitterness",ex2:"Years of unfair treatment built up deep resentment among staff.",exTr2:"Yıllarca süren haksız muamele, personel arasında derin bir gücenme yarattı.",ex3:"He tried to hide his resentment during the meeting.",exTr3:"Toplantı sırasında gücenmesini gizlemeye çalıştı.",level:"C1",cat:"defter"},
+{id:732,en:"inquiry",tr:"araştırma, soruşturma",pos:"n.",ex:"An official inquiry was launched into the incident.",syn:"investigation",ex2:"The inquiry concluded that no wrongdoing had occurred.",exTr2:"Soruşturma, herhangi bir yanlışlığın olmadığı sonucuna vardı.",ex3:"She submitted a formal inquiry about the delayed shipment.",exTr3:"Gecikmiş sevkiyat hakkında resmi bir soru sundu.",level:"C1",cat:"defter"},
+{id:733,en:"struggle",tr:"mücadele",pos:"n.",ex:"The struggle against infectious diseases is far from over.",syn:"fight, effort",ex2:"Many families struggle to afford rising healthcare costs.",exTr2:"Birçok aile, yükselen sağlık maliyetlerini karşılamakta zorlanıyor.",ex3:"The struggle for independence lasted several decades.",exTr3:"Bağımsızlık mücadelesi birkaç on yıl sürdü.",level:"B2",cat:"defter"},
+{id:734,en:"favour",tr:"iyilik; lehte olma",pos:"n.",ex:"The evidence weighs in favour of early intervention.",syn:"support, approval",ex2:"Public opinion has shifted in favour of renewable energy.",exTr2:"Kamuoyu, yenilenebilir enerji lehine değişti.",ex3:"He asked his colleague for a small favour.",exTr3:"Meslektaşından küçük bir iyilik istedi.",level:"B2",cat:"defter"},
+{id:735,en:"alliance",tr:"ittifak, müttefiklik",pos:"n.",ex:"The two nations formed a strategic alliance.",syn:"coalition, partnership",ex2:"The alliance between the two universities led to joint research.",exTr2:"İki üniversite arasındaki ittifak, ortak araştırmalara yol açtı.",ex3:"Historians studied the collapse of the ancient alliance.",exTr3:"Tarihçiler, antik ittifakın çöküşünü incelediler.",level:"C1",cat:"defter"},
+{id:736,en:"precaution",tr:"önlem, tedbir",pos:"n.",ex:"Strict precautions were taken to prevent contamination.",syn:"safeguard, measure",ex2:"As a precaution, the bridge was closed during the storm.",exTr2:"Önlem olarak, fırtına sırasında köprü kapatıldı.",ex3:"Doctors take extra precautions when treating contagious patients.",exTr3:"Doktorlar bulaşıcı hastaları tedavi ederken ekstra önlem alır.",level:"B2",cat:"defter"},
+{id:737,en:"assumption",tr:"varsayım",pos:"n.",ex:"The model rests on the assumption of random sampling.",syn:"presumption, premise",ex2:"The study challenges a long-held assumption about diet and weight.",exTr2:"Çalışma, diyet ve kilo hakkında uzun süredir kabul gören bir varsayımı sorguluyor.",ex3:"His conclusion rests on a questionable assumption.",exTr3:"Sonucu, sorgulanabilir bir varsayıma dayanıyor.",level:"C1",cat:"defter"},
+{id:738,en:"consequence",tr:"sonuç",pos:"n.",ex:"Rising sea levels are a direct consequence of global warming.",syn:"result, outcome",ex2:"Every decision carries consequences, whether intended or not.",exTr2:"Her karar, istense de istenmese de sonuçlar doğurur.",ex3:"The policy had unintended consequences for small farmers.",exTr3:"Politika, küçük çiftçiler için istenmeyen sonuçlar doğurdu.",level:"B2",cat:"defter"},
+{id:739,en:"adjustment",tr:"ayarlama, uyarlama",pos:"n.",ex:"After adjustment for age, the effect remained significant.",syn:"modification",ex2:"Moving to a new country requires significant emotional adjustment.",exTr2:"Yeni bir ülkeye taşınmak önemli bir duygusal uyum gerektirir.",ex3:"The engineer made a small adjustment to the machine's settings.",exTr3:"Mühendis, makinenin ayarlarında küçük bir düzenleme yaptı.",level:"C1",cat:"defter"},
+{id:740,en:"retention",tr:"alıkoyma, tutulma; akılda tutma",pos:"n.",ex:"Spaced repetition improves long-term retention of vocabulary.",syn:"preservation",ex2:"The company improved employee retention by offering flexible hours.",exTr2:"Şirket, esnek çalışma saatleri sunarak çalışan bağlılığını artırdı.",ex3:"Water retention in the soil helps crops survive dry spells.",exTr3:"Topraktaki su tutma kapasitesi, mahsullerin kurak dönemlerde hayatta kalmasına yardımcı olur.",level:"C1",cat:"defter"},
+{id:741,en:"proximity",tr:"yakınlık",pos:"n.",ex:"Proximity to a trauma center improves survival rates.",syn:"closeness, nearness",ex2:"The hotel's proximity to the airport makes it popular with travelers.",exTr2:"Otelin havalimanına yakınlığı, onu gezginler arasında popüler yapıyor.",ex3:"Living in close proximity to nature improves mental well-being.",exTr3:"Doğaya yakın yaşamak zihinsel iyi oluşu artırır.",level:"C1",cat:"defter"},
+{id:742,en:"conversion",tr:"dönüştürme, dönüşüm",pos:"n.",ex:"The conversion of forests into farmland threatens biodiversity.",syn:"transformation",ex2:"The conversion of the old factory into apartments took two years.",exTr2:"Eski fabrikanın apartmanlara dönüştürülmesi iki yıl sürdü.",ex3:"The website's conversion rate improved after the redesign.",exTr3:"Web sitesinin dönüşüm oranı yeniden tasarımdan sonra iyileşti.",level:"C1",cat:"defter"},
+{id:743,en:"deterrent",tr:"caydırıcı",pos:"n.",ex:"Heavy fines act as a deterrent against speeding.",syn:"discouragement",ex2:"High fines act as a deterrent against illegal dumping.",exTr2:"Yüksek para cezaları yasa dışı atık dökümüne karşı caydırıcı olur.",ex3:"Some argue the death penalty is not an effective deterrent.",exTr3:"Bazıları idam cezasının etkili bir caydırıcı olmadığını savunuyor.",level:"C1",cat:"defter"},
+{id:744,en:"incentive",tr:"teşvik",pos:"n.",ex:"Tax breaks provide an incentive for companies to invest in research.",syn:"motivation, stimulus",ex2:"The government offers incentives for companies that hire veterans.",exTr2:"Hükümet, gazileri işe alan şirketlere teşvik sunuyor.",ex3:"Bonuses give employees an incentive to work efficiently.",exTr3:"İkramiyeler, çalışanlara verimli çalışma teşviki verir.",level:"C1",cat:"defter"},
+{id:745,en:"affair",tr:"iş, mesele; ilişki",pos:"n.",ex:"The ministry handles all foreign affairs.",syn:"matter, issue",ex2:"The minister resigned after the affair became public.",exTr2:"Mesele kamuoyuna yansıdıktan sonra bakan istifa etti.",ex3:"Foreign affairs dominated the summit's agenda.",exTr3:"Dış ilişkiler, zirvenin gündemine hâkim oldu.",level:"B2",cat:"defter"},
+{id:746,en:"disturbance",tr:"rahatsızlık, bozulma",pos:"n.",ex:"Sleep disturbance is common among shift workers.",syn:"disruption",ex2:"Loud construction noise caused a disturbance in the neighborhood.",exTr2:"Yüksek sesli inşaat gürültüsü mahallede rahatsızlığa yol açtı.",ex3:"Doctors linked the disturbance in his sleep to caffeine intake.",exTr3:"Doktorlar, uykusundaki bozulmayı kafein tüketimine bağladı.",level:"C1",cat:"defter"},
+{id:747,en:"fulfilment",tr:"yerine getirme; tatmin",pos:"n.",ex:"The fulfilment of these criteria is required for diagnosis.",syn:"achievement, completion",ex2:"Volunteering gave her a deep sense of fulfilment.",exTr2:"Gönüllülük ona derin bir tatmin duygusu verdi.",ex3:"The fulfilment of the contract took longer than expected.",exTr3:"Sözleşmenin yerine getirilmesi beklenenden uzun sürdü.",level:"C1",cat:"defter"},
+{id:748,en:"reversal",tr:"geri dönüş, tersine çevirme",pos:"n.",ex:"The policy reversal surprised international observers.",syn:"turnaround",ex2:"The court's reversal of the ruling surprised legal experts.",exTr2:"Mahkemenin kararı tersine çevirmesi hukuk uzmanlarını şaşırttı.",ex3:"A sudden reversal in the economy affected thousands of jobs.",exTr3:"Ekonomideki ani bir tersine dönüş binlerce işi etkiledi.",level:"C1",cat:"defter"},
+{id:749,en:"decline",tr:"azalma, gerileme",pos:"n.",ex:"The country experienced a sharp decline in birth rates.",syn:"decrease, downturn",ex2:"The company's profits declined sharply last quarter.",exTr2:"Şirketin kârı geçen çeyrekte keskin biçimde geriledi.",ex3:"There has been a steady decline in bee populations.",exTr3:"Arı popülasyonlarında istikrarlı bir azalma yaşanıyor.",level:"B2",cat:"defter"},
+{id:750,en:"demand",tr:"talep",pos:"n.",ex:"The demand for emergency services rises sharply in winter.",syn:"need, requirement",ex2:"Demand for electric cars has grown rapidly in recent years.",exTr2:"Elektrikli araçlara olan talep son yıllarda hızla arttı.",ex3:"The union's demands included higher wages and shorter hours.",exTr3:"Sendikanın talepleri arasında daha yüksek ücret ve daha kısa çalışma saatleri vardı.",level:"B2",cat:"defter"},
+{id:751,en:"pollution",tr:"kirlilik",pos:"n.",ex:"Air pollution is linked to respiratory diseases.",syn:"contamination",ex2:"Noise pollution can negatively affect sleep quality.",exTr2:"Gürültü kirliliği uyku kalitesini olumsuz etkileyebilir.",ex3:"The city introduced measures to reduce plastic pollution.",exTr3:"Şehir, plastik kirliliğini azaltmak için önlemler getirdi.",level:"B2",cat:"defter"},
+{id:752,en:"violence",tr:"şiddet",pos:"n.",ex:"Exposure to violence in childhood has lasting effects.",syn:"aggression",ex2:"The film was criticized for its graphic violence.",exTr2:"Film, açık şiddet sahneleri nedeniyle eleştirildi.",ex3:"Community programs aim to reduce domestic violence.",exTr3:"Toplum programları, aile içi şiddeti azaltmayı hedefliyor.",level:"B2",cat:"defter"},
+{id:753,en:"attribution",tr:"atfetme, yükleme",pos:"n.",ex:"The attribution of the outbreak to a single source proved difficult.",syn:"ascription",ex2:"The report gives clear attribution to each data source.",exTr2:"Rapor, her veri kaynağına açık atıf veriyor.",ex3:"Scientists were cautious about the attribution of the disease's cause.",exTr3:"Bilim insanları, hastalığın nedenine ilişkin atıf konusunda temkinliydi.",level:"C1",cat:"defter"},
+{id:754,en:"eradication",tr:"kökünü kazıma, yok etme",pos:"n.",ex:"The eradication of smallpox is a landmark of public health.",syn:"elimination",ex2:"Global eradication of polio is nearly complete.",exTr2:"Çocuk felcinin küresel olarak kökünün kazınması neredeyse tamamlandı.",ex3:"The campaign focuses on the eradication of extreme poverty.",exTr3:"Kampanya, aşırı yoksulluğun ortadan kaldırılmasına odaklanıyor.",level:"C1",cat:"defter"},
+{id:755,en:"emergence",tr:"ortaya çıkma",pos:"n.",ex:"The emergence of drug-resistant strains alarmed clinicians.",syn:"appearance, rise",ex2:"The emergence of new technologies changed the job market.",exTr2:"Yeni teknolojilerin ortaya çıkışı, iş piyasasını değiştirdi.",ex3:"Scientists are monitoring the emergence of new virus variants.",exTr3:"Bilim insanları yeni virüs varyantlarının ortaya çıkışını izliyor.",level:"C1",cat:"defter"},
+{id:756,en:"conclusion",tr:"sonuç, vargı",pos:"n.",ex:"The authors reached a cautious conclusion based on limited data.",syn:"inference, verdict",ex2:"The jury reached its conclusion after hours of deliberation.",exTr2:"Jüri, saatler süren müzakerenin ardından sonuca vardı.",ex3:"In conclusion, the study supports the original hypothesis.",exTr3:"Sonuç olarak, çalışma orijinal hipotezi destekliyor.",level:"B2",cat:"defter"},
+{id:757,en:"engagement",tr:"meşguliyet, katılım",pos:"n.",ex:"Patient engagement improves adherence to treatment.",syn:"involvement",ex2:"The campaign increased public engagement with the issue.",exTr2:"Kampanya, konuya kamu katılımını artırdı.",ex3:"Employee engagement improved after the new policy was introduced.",exTr3:"Yeni politika getirildikten sonra çalışan bağlılığı arttı.",level:"C1",cat:"defter"},
+{id:758,en:"obstacle",tr:"engel",pos:"n.",ex:"Limited funding remains the main obstacle to progress.",syn:"barrier, hurdle",ex2:"Language remained the biggest obstacle to her career abroad.",exTr2:"Dil, yurt dışındaki kariyerinin önündeki en büyük engel olmaya devam etti.",ex3:"The team overcame several obstacles to finish the project.",exTr3:"Ekip, projeyi bitirmek için birçok engeli aştı.",level:"B2",cat:"defter"},
+{id:759,en:"resistance",tr:"direnç",pos:"n.",ex:"Antibiotic resistance poses a global health threat.",syn:"opposition, immunity",ex2:"Exercise builds resistance to certain chronic diseases.",exTr2:"Egzersiz, bazı kronik hastalıklara karşı direnç oluşturur.",ex3:"The proposal faced strong resistance from local residents.",exTr3:"Teklif, yerel halktan güçlü direnişle karşılaştı.",level:"B2",cat:"defter"},
+{id:760,en:"exposure",tr:"maruz kalma",pos:"n.",ex:"Prolonged exposure to noise can damage hearing.",syn:"contact, subjection",ex2:"Early exposure to reading improves children's vocabulary.",exTr2:"Okumaya erken maruz kalmak, çocukların kelime dağarcığını geliştirir.",ex3:"Workers wore protective gear to limit exposure to chemicals.",exTr3:"İşçiler, kimyasallara maruz kalmayı sınırlamak için koruyucu ekipman giydi.",level:"C1",cat:"defter"},
+{id:761,en:"superiority",tr:"üstünlük",pos:"n.",ex:"The trial failed to demonstrate the superiority of the new drug.",syn:"dominance, advantage",ex2:"The champion demonstrated clear superiority throughout the match.",exTr2:"Şampiyon, maç boyunca açık bir üstünlük sergiledi.",ex3:"The report questioned the superiority of the new method.",exTr3:"Rapor, yeni yöntemin üstünlüğünü sorguladı.",level:"C1",cat:"defter"},
+{id:762,en:"deduction",tr:"çıkarım; kesinti",pos:"n.",ex:"His conclusion was based on logical deduction rather than evidence.",syn:"inference, reasoning",ex2:"Employees can claim a tax deduction for work-related expenses.",exTr2:"Çalışanlar iş ile ilgili masraflar için vergi indirimi talep edebilir.",ex3:"The detective's deduction proved to be correct.",exTr3:"Dedektifin çıkarımı doğru çıktı.",level:"C1",cat:"defter"},
+{id:763,en:"involvement",tr:"karışma, dahil olma",pos:"n.",ex:"Parental involvement strongly predicts academic success.",syn:"participation",ex2:"Her involvement in the project was limited to the early stages.",exTr2:"Projedeki katılımı yalnızca ilk aşamalarla sınırlıydı.",ex3:"Parental involvement plays a key role in a child's education.",exTr3:"Ebeveyn katılımı, bir çocuğun eğitiminde kilit rol oynar.",level:"C1",cat:"defter"},
+{id:764,en:"contribution",tr:"katkı",pos:"n.",ex:"Her contribution to the field earned international recognition.",syn:"input, addition",ex2:"Each member's contribution was acknowledged in the final report.",exTr2:"Her üyenin katkısı, nihai raporda kabul edildi.",ex3:"The charity relies on public contributions to fund its programs.",exTr3:"Hayır kurumu, programlarını finanse etmek için halkın katkılarına dayanıyor.",level:"B2",cat:"defter"},
+{id:765,en:"disparity",tr:"uçurum, eşitsizlik, fark",pos:"n.",ex:"Regional disparities in healthcare access persist despite reforms.",syn:"gap, inequality",ex2:"The report highlights income disparity between urban and rural areas.",exTr2:"Rapor, kentsel ve kırsal bölgeler arasındaki gelir eşitsizliğini vurguluyor.",ex3:"Efforts were made to reduce the disparity in healthcare access.",exTr3:"Sağlık hizmetlerine erişimdeki eşitsizliği azaltmak için çabalar sarf edildi.",level:"C1",cat:"defter"},
+{id:766,en:"interpret",tr:"yorumlamak",pos:"v.",ex:"Individuals with social anxiety disorder often struggle to interpret other people's intentions correctly.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:767,en:"provoke",tr:"kışkırtmak",pos:"v.",ex:"Reckless political statements can provoke public outrage.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:768,en:"heighten",tr:"yükseltmek, artırmak",pos:"v.",ex:"The new evidence heightened suspicion about the cause of the outbreak.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:769,en:"spread",tr:"yaymak, yayılmak",pos:"v.",ex:"Propaganda is a tactic in which groups attempt to spread misinformation to influence others.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:770,en:"protest",tr:"protesto etmek",pos:"v.",ex:"Local residents protested the construction of the new plant.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:771,en:"assign",tr:"görevlendirmek, atamak",pos:"v.",ex:"Patients were randomly assigned to one of two treatment groups.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:772,en:"adapt",tr:"uyum sağlamak",pos:"v.",ex:"Individuals living near coastal regions must be ready to adapt to the effects of rising sea levels.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:773,en:"withdraw",tr:"geri çekilmek, çekmek",pos:"v.",ex:"Several countries withdrew their troops after the ceasefire.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:774,en:"settle",tr:"yerleşmek; çözüme kavuşturmak",pos:"v.",ex:"The dispute was eventually settled out of court.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:775,en:"confine",tr:"sınırlandırmak",pos:"v.",ex:"Access to the archive is confined to registered researchers.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:776,en:"extend",tr:"uzatmak, genişletmek",pos:"v.",ex:"Sony intends to extend its operations to the global market.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:777,en:"enforce",tr:"(kural) yürürlüğe koymak, uygulatmak",pos:"v.",ex:"Authorities began to enforce the new safety regulations strictly.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:778,en:"originate",tr:"-den türemek, kökeni olmak",pos:"v.",ex:"Many believe that pizza originated from simple flatbreads made in ancient Italy.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:779,en:"discard",tr:"atmak, çıkarmak",pos:"v.",ex:"Contaminated samples were discarded before analysis.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:780,en:"conduct",tr:"yürütmek, yapmak",pos:"v.",ex:"The team conducted a series of controlled experiments.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:781,en:"utilize",tr:"kullanmak, yararlanmak",pos:"v.",ex:"Stainless steel is utilized in many kitchen appliances due to its durability.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:782,en:"deceive",tr:"aldatmak",pos:"v.",ex:"The advertisement was designed to deceive customers about the product's benefits.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:783,en:"acquire",tr:"kazanmak, edinmek",pos:"v.",ex:"Calcium must be acquired through diet since the body cannot produce it naturally.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:784,en:"conclude",tr:"sonuca varmak",pos:"v.",ex:"The researchers concluded that the treatment was safe and effective.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:785,en:"oppose",tr:"karşı koymak, karşı çıkmak",pos:"v.",ex:"Many scientists opposed the theory when it was first proposed.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:786,en:"embrace",tr:"benimsemek, kucaklamak",pos:"v.",ex:"The concept of algebra was quickly embraced by Arab scholars.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:787,en:"occupy",tr:"işgal etmek; kaplamak",pos:"v.",ex:"The new wing will occupy the space once used as a parking lot.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:788,en:"inflict",tr:"zarar vermek, acı vermek",pos:"v.",ex:"The disease inflicts severe damage on the nervous system.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:789,en:"perform",tr:"yapmak, gerçekleştirmek",pos:"v.",ex:"Surgeons performed the procedure without complications.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:790,en:"ignore",tr:"göz ardı etmek",pos:"v.",ex:"Early warning signs of the disease are often ignored by patients.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:791,en:"emit",tr:"yaymak, salmak",pos:"v.",ex:"Certain gases emitted by factories contribute to air pollution.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:792,en:"pose",tr:"(risk, tehdit) oluşturmak",pos:"v.",ex:"Changes in population trends will pose significant obstacles to financial stability.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:793,en:"occur",tr:"olmak, meydana gelmek",pos:"v.",ex:"Side effects rarely occur when the drug is administered correctly.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:794,en:"obstruct",tr:"engellemek",pos:"v.",ex:"A blood clot can obstruct normal circulation.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:795,en:"surpass",tr:"aşmak, geçmek",pos:"v.",ex:"The new device surpasses older models in both speed and accuracy.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:796,en:"engage",tr:"meşgul etmek; katılmak",pos:"v.",ex:"Patients who engage actively with their treatment plan recover faster.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:797,en:"exert",tr:"(güç, çaba) sarf etmek, harcamak",pos:"v.",ex:"Chronic illness exerts a heavy toll on family caregivers.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:798,en:"boost",tr:"artırmak, güçlendirmek",pos:"v.",ex:"Caffeine is often used to boost focus and alertness.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:799,en:"convey",tr:"taşımak, aktarmak, iletmek",pos:"v.",ex:"The report conveys the urgency of the situation clearly.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:800,en:"surround",tr:"çevrelemek, kuşatmak",pos:"v.",ex:"The Great Barrier Reef got its name from the underwater structure that surrounds it.",syn:"encircle",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:801,en:"compel",tr:"(birini) zorlamak",pos:"v.",ex:"New evidence compelled the committee to reconsider its decision.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:802,en:"justify",tr:"haklı çıkarmak",pos:"v.",ex:"The modest benefits did not justify the high cost of the treatment.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:803,en:"consolidate",tr:"güçlendirmek, pekiştirmek",pos:"v.",ex:"The merger consolidated the company's position in the market.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:804,en:"feature",tr:"özelliğine sahip olmak, içermek",pos:"v.",ex:"The new model features a lighter frame and longer battery life.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:805,en:"release",tr:"salmak, yaymak; serbest bırakmak",pos:"v.",ex:"The volcano released large amounts of ash into the atmosphere.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:806,en:"stimulate",tr:"uyarmak, harekete geçirmek",pos:"v.",ex:"Exercise stimulates the release of endorphins.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:807,en:"inform",tr:"bilgilendirmek",pos:"v.",ex:"A guide should inform climbers about potential risks before any expedition.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:808,en:"modify",tr:"değiştirmek, tadil etmek",pos:"v.",ex:"Researchers modified the protocol after the pilot study.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:809,en:"suspend",tr:"askıya almak",pos:"v.",ex:"The trial was suspended after several adverse events were reported.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:810,en:"enable",tr:"olanak tanımak, izin vermek",pos:"v.",ex:"New imaging techniques enable earlier diagnosis of the disease.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:811,en:"persuade",tr:"ikna etmek",pos:"v.",ex:"The data persuaded the board to fund the project.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:812,en:"respond",tr:"yanıt vermek, tepki vermek",pos:"v.",ex:"Most patients responded well to the new therapy.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:813,en:"enclose",tr:"kapsamak, çevrelemek",pos:"v.",ex:"The cell membrane encloses the organelles within the cytoplasm.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:814,en:"accelerate",tr:"hızlandırmak",pos:"v.",ex:"The rise in technology use has significantly accelerated since the advent of smartphones.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:815,en:"shift",tr:"değişim, geçiş",pos:"n.",ex:"The term demographic transition implies a shift from high to low birth and death rates.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:816,en:"interval",tr:"ara, aralık",pos:"n.",ex:"Blood pressure was measured at regular intervals throughout the study.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:817,en:"variation",tr:"değişiklik, çeşitlilik",pos:"n.",ex:"There was considerable variation in response between patients.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:818,en:"convenience",tr:"rahatlık, kolaylık",pos:"n.",ex:"Online consultations offer greater convenience for rural patients.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:819,en:"intervention",tr:"müdahale",pos:"n.",ex:"Early intervention greatly improves the prognosis in these cases.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:820,en:"susceptibility",tr:"hassasiyet, yatkınlık",pos:"n.",ex:"Compromised immune function increases the body's susceptibility to infections.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:821,en:"adherence",tr:"bağlılık, uyma",pos:"n.",ex:"Adherence to the medication schedule was poor among younger patients.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:822,en:"transformation",tr:"dönüşüm",pos:"n.",ex:"The industry underwent a rapid digital transformation.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:823,en:"skepticism",tr:"şüphecilik",pos:"n.",ex:"The findings were met with considerable skepticism from the scientific community.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:824,en:"initiative",tr:"girişim, teşvik",pos:"n.",ex:"The ministry launched a new initiative to reduce childhood obesity.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:825,en:"impact",tr:"etki",pos:"n.",ex:"The U.S. has a significant impact on global market trends.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:826,en:"recovery",tr:"iyileşme, toparlanma",pos:"n.",ex:"Full recovery from the surgery typically takes six weeks.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:827,en:"relevance",tr:"alaka, ilgi",pos:"n.",ex:"The study's relevance to clinical practice was widely acknowledged.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:828,en:"discrimination",tr:"ayrımcılık",pos:"n.",ex:"It is still common to witness racial discrimination in job opportunities and salary levels.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:829,en:"reference",tr:"başvuru, atıf, referans",pos:"n.",ex:"The manuscript included over sixty references.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:830,en:"assurance",tr:"güvence",pos:"n.",ex:"The manufacturer provided assurance of the device's safety.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:831,en:"authority",tr:"yetki, otorite",pos:"n.",ex:"The health authority issued new guidelines on vaccination.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:832,en:"reliance",tr:"bağlılık, güven, dayanma",pos:"n.",ex:"Excessive reliance on antibiotics has contributed to resistance.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:833,en:"despair",tr:"umutsuzluk",pos:"n.",ex:"Chronic pain can lead patients to a sense of despair.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:834,en:"tendency",tr:"eğilim",pos:"n.",ex:"Humans show a strong tendency to form lifelong partnerships.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:835,en:"permission",tr:"izin",pos:"n.",ex:"Researchers must obtain permission before accessing patient records.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:836,en:"maintenance",tr:"bakım",pos:"n.",ex:"Regular maintenance of the equipment prevents malfunction.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:837,en:"disruption",tr:"yıkım, aksama, bozulma",pos:"n.",ex:"The strike caused major disruption to hospital services.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:838,en:"advancement",tr:"gelişme, ilerleme",pos:"n.",ex:"The invention of the internet brought significant advancements in communication.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:839,en:"deformity",tr:"şekil bozukluğu",pos:"n.",ex:"The condition can cause severe deformity if left untreated.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:840,en:"determination",tr:"azim, kararlılık",pos:"n.",ex:"Her determination to finish the trial impressed the whole team.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:841,en:"access",tr:"erişim",pos:"n.",ex:"The WHO aims to ensure everyone has access to affordable healthcare.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:842,en:"excess",tr:"aşırılık, fazlalık",pos:"n.",ex:"Excess sugar intake is linked to metabolic disorders.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:843,en:"dedication",tr:"adanmışlık",pos:"n.",ex:"The award recognized her dedication to patient care.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:844,en:"insight",tr:"kavrayış, anlama, iç görü",pos:"n.",ex:"The study provides new insight into the disease mechanism.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:845,en:"fragility",tr:"kırılganlık",pos:"n.",ex:"Bone fragility increases significantly with age.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:846,en:"intensity",tr:"yoğunluk",pos:"n.",ex:"Scientists documented an increase in the intensity of the bushfire season.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:847,en:"confrontation",tr:"çatışma, yüzleşme",pos:"n.",ex:"The dispute escalated into a direct confrontation between the two departments.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:848,en:"identification",tr:"tanımlama, kimlik tespiti",pos:"n.",ex:"Interpol relies on forensic odontology for the identification of victims.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:849,en:"devastation",tr:"yıkım",pos:"n.",ex:"The earthquake caused widespread devastation across the region.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:850,en:"supervision",tr:"denetleme, gözetim",pos:"n.",ex:"The procedure was performed under close supervision.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:851,en:"withdrawal",tr:"geri çekilme, çekilme",pos:"n.",ex:"Sudden withdrawal from the medication can cause severe symptoms.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:852,en:"prevalence",tr:"yaygınlık",pos:"n.",ex:"The escalating prevalence of heart disease is a major public health concern.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:853,en:"termination",tr:"sonlanma, sona erdirme",pos:"n.",ex:"Early termination of the trial was recommended due to safety concerns.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:854,en:"aggravation",tr:"kötüleşme",pos:"n.",ex:"Chronic stress can contribute to the aggravation of pre-existing conditions.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:855,en:"clarification",tr:"açıklama",pos:"n.",ex:"The editor requested clarification on the statistical methods used.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:856,en:"dismissal",tr:"kovma, reddetme",pos:"n.",ex:"The reviewer's dismissal of the theory was later shown to be premature.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:857,en:"dependency",tr:"bağımlılık",pos:"n.",ex:"Long-term use of the drug can lead to dependency.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:858,en:"rejection",tr:"reddetme, ret",pos:"n.",ex:"The manuscript faced rejection at three journals before publication.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:859,en:"sequence",tr:"dizi, sıra",pos:"n.",ex:"The DNA sequence revealed a rare mutation.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:860,en:"combination",tr:"birleşim, kombinasyon",pos:"n.",ex:"Many physical traits are determined by a combination of genes and environment.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:861,en:"conformity",tr:"uyum, uygunluk",pos:"n.",ex:"The device was tested for conformity with safety standards.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:862,en:"prescription",tr:"reçete",pos:"n.",ex:"The prescription must be renewed every three months.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:863,en:"suggestion",tr:"öneri",pos:"n.",ex:"The panel's suggestion was to expand the sample size.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:864,en:"similarity",tr:"benzerlik",pos:"n.",ex:"There was a striking similarity between the two case reports.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:865,en:"severity",tr:"şiddet",pos:"n.",ex:"Treatment options are available to reduce the severity of symptoms.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:866,en:"significance",tr:"önem",pos:"n.",ex:"Japanese society places great significance on education.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:867,en:"irrelevance",tr:"alakasızlık, ilgisizlik",pos:"n.",ex:"The judge dismissed the argument on the grounds of irrelevance.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:868,en:"comparison",tr:"karşılaştırma",pos:"n.",ex:"A direct comparison between the two drugs was not possible.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:869,en:"appeal",tr:"cazibe, çekicilik",pos:"n.",ex:"The therapy's appeal lies in its low cost and simplicity.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:870,en:"measure",tr:"ölçü, önlem",pos:"n.",ex:"Strict measures were introduced to contain the outbreak.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:871,en:"scarcity",tr:"kıtlık",pos:"n.",ex:"Scarcity of donor organs remains a major obstacle in transplant medicine.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:872,en:"approach",tr:"yaklaşım",pos:"n.",ex:"The clinic adopted a multidisciplinary approach to chronic pain.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:873,en:"threat",tr:"tehdit",pos:"n.",ex:"Industrial waste poses a great threat to marine ecosystems.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:874,en:"achievement",tr:"başarı",pos:"n.",ex:"The acquisition of Florida was a significant achievement for the U.S.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:875,en:"disagreement",tr:"anlaşmazlık",pos:"n.",ex:"There was disagreement among reviewers about the study's validity.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:876,en:"limitation",tr:"sınırlandırma, kısıtlama",pos:"n.",ex:"The authors acknowledged several limitations of their study.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:877,en:"celebration",tr:"kutlama",pos:"n.",ex:"The centenary was marked with a nationwide celebration.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:878,en:"manipulation",tr:"manipülasyon",pos:"n.",ex:"Genetic manipulation raises important ethical questions.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:879,en:"heredity",tr:"kalıtım",pos:"n.",ex:"Heredity plays a major role in determining susceptibility to the disease.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:880,en:"progression",tr:"ilerleme",pos:"n.",ex:"Regular monitoring helps track the progression of the illness.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:881,en:"detection",tr:"tespit etme, saptama",pos:"n.",ex:"CRISPR enables unprecedented possibilities for early disease detection.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:882,en:"contamination",tr:"kirlilik, bulaşma",pos:"n.",ex:"Strict protocols prevent contamination of the samples.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"}
+];
+
+function getCats(){return{...CATS,...(state.customCats||{})};}
+function catOptionsHtml(){
+  return Object.entries(getCats()).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join("");
+}
+function populateCategorySelects(){
+  const study=document.getElementById("studyCat");
+  if(study){const v=study.value;study.innerHTML=`<option value="">Tüm kategoriler</option>`+catOptionsHtml();study.value=getCats()[v]?v:"";}
+  const qc=document.getElementById("qCat");
+  if(qc){const v=qc.value;qc.innerHTML=`<option value="">Tümü</option>`+catOptionsHtml();qc.value=getCats()[v]?v:"";}
+  const ac=document.getElementById("addCat");
+  if(ac){const v=ac.value;ac.innerHTML=catOptionsHtml()+`<option value="__new__">➕ Yeni grup ekle</option>`;ac.value=getCats()[v]?v:"ozel";}
+  const pc=document.getElementById("pvCat");
+  if(pc){const v=pc.value;pc.innerHTML=catOptionsHtml()+`<option value="__new__">➕ Yeni grup ekle</option>`;pc.value=getCats()[v]?v:"ozel";}
+  updateSubcatSelect();
+}
+function handleNewCatOption(selectId){
+  const sel=document.getElementById(selectId);
+  if(sel.value!=="__new__")return;
+  const label=(prompt("Yeni grubun adı ne olsun?")||"").trim();
+  if(!label){sel.value="ozel";return;}
+  const slug="g_"+label.toLowerCase()
+    .replace(/ç/g,"c").replace(/ğ/g,"g").replace(/ı/g,"i").replace(/ö/g,"o").replace(/ş/g,"s").replace(/ü/g,"u")
+    .replace(/[^a-z0-9]+/g,"")||("g_"+now());
+  state.customCats=state.customCats||{};
+  state.customCats[slug]=label;
+  saveState();
+  populateCategorySelects();
+  sel.value=slug;
+}
+const KEY="kelimeDefteriV2";
+let memStore=null;
+function defaultState(){
+  return{
+    profile:"emir",theme:"light",examDate:null,customWords:[],
+    profiles:{
+      emir:{progress:{},history:{},newPerDay:20,totalReviews:0,streak:0,lastStudyDay:null},
+      irem:{progress:{},history:{},newPerDay:20,totalReviews:0,streak:0,lastStudyDay:null}
+    }
+  };
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw)return normalize(JSON.parse(raw));
+    const old=localStorage.getItem("kelimeDefteriV1");
+    if(old){const s=normalize(JSON.parse(old));return s;}
+  }catch(e){}
+  return memStore||defaultState();
+}
+function normalize(s){
+  const d=defaultState();
+  s.theme=s.theme||"light";
+  s.examDate=s.examDate||null;
+  s.customWords=(s.customWords||[]).map(w=>({cat:"ozel",...w,custom:true}));
+  s.customWords.forEach(w=>{if(!w.cat||w.cat==="genel")w.cat="ozel";});
+  ["emir","irem"].forEach(p=>{s.profiles[p]={...d.profiles[p],...(s.profiles[p]||{})};});
+  return s;
+}
+function saveState(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){memStore=state;}}
+let state=loadState();
+
+/* ================= HELPERS ================= */
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const now=()=>Date.now();
+const DAY=86400000;
+const STUBBORN_LAPSES=4;
+function allWords(){return WORDS.concat(state.customWords);}
+function prof(){return state.profiles[state.profile];}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function jsq(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'");}
+function toast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),2000);
+}
+function speak(text){
+  if(!("speechSynthesis" in window)){toast("Bu tarayıcı seslendirmeyi desteklemiyor");return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);u.lang="en-US";u.rate=0.9;
+  speechSynthesis.speak(u);
+}
+function applyTheme(){
+  document.documentElement.setAttribute("data-theme",state.theme);
+  document.getElementById("themeToggle").classList.toggle("on",state.theme==="dark");
+}
+function toggleTheme(){state.theme=state.theme==="dark"?"light":"dark";saveState();applyTheme();}
+
+/* ================= PROFILE & NAV ================= */
+function setProfile(p){
+  state.profile=p;saveState();
+  document.getElementById("pEmir").classList.toggle("active",p==="emir");
+  document.getElementById("pIrem").classList.toggle("active",p==="irem");
+  session=null;quiz=null;
+  populateCategorySelects();
+  refreshAll();
+}
+function showScreen(name){
+  const leavingStudyMidSession=document.getElementById("screen-study").classList.contains("active")&&name!=="study"&&
+    session&&!session.finished&&session.touched&&session.touched.size>0&&session.index<session.queue.length;
+  if(leavingStudyMidSession)finalizeSession("auto");
+  ["study","quiz","words","profile"].forEach(s=>{
+    document.getElementById("screen-"+s).classList.toggle("active",s===name);
+    document.getElementById("nav"+s[0].toUpperCase()+s.slice(1)).classList.toggle("active",s===name);
+  });
+  if(name==="study")renderStudy();
+  if(name==="quiz")renderQuizHome();
+  if(name==="words")renderWordList();
+  if(name==="profile")renderProfile();
+}
+
+/* ================= SRS (SM-2 lite) ================= */
+function getProg(id){return prof().progress[id]||{reps:0,interval:0,ease:2.5,due:0,lapses:0};}
+function isKnown(p){return p.reps>=3&&p.interval>=21;}
+function statusOf(id){
+  const p=prof().progress[id];
+  if(!p||p.reps===0)return"new";
+  if((p.lapses||0)>=STUBBORN_LAPSES&&!isKnown(p))return"stubborn";
+  return isKnown(p)?"known":"learning";
+}
+function grade(id,g){
+  const p=getProg(id);
+  if(p.reps===0)p.firstDay=todayStr();
+  if(g===1){p.ease=Math.max(1.3,p.ease-0.2);p.interval=0;p.lapses=(p.lapses||0)+1;p.due=now()+10*60000;}
+  else{
+    if(g===2){p.ease=Math.max(1.3,p.ease-0.15);p.interval=p.interval===0?1:Math.max(1,Math.round(p.interval*1.2));}
+    if(g===3){p.interval=p.interval===0?1:Math.round(p.interval*p.ease);}
+    if(g===4){p.ease+=0.15;p.interval=p.interval===0?3:Math.round(p.interval*p.ease*1.3);}
+    p.interval=Math.min(p.interval,365);
+    p.due=now()+p.interval*DAY;
+  }
+  p.reps++;
+  p.exIdx=(p.exIdx||0)+1;
+  prof().progress[id]=p;
+  const d=todayStr();
+  prof().history[d]=(prof().history[d]||0)+1;
+  prof().totalReviews++;
+  updateStreak();
+  saveState();
+}
+function updateStreak(){
+  const pr=prof();const d=todayStr();
+  if(pr.lastStudyDay===d)return;
+  const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);
+  pr.streak=(pr.lastStudyDay===yest)?pr.streak+1:1;
+  pr.lastStudyDay=d;
+}
+
+/* ================= STUDY ================= */
+let session=null;
+function catFilterFn(){
+  const c=document.getElementById("studyCat").value;
+  const subEl=document.getElementById("studySub");
+  const sub=(subEl&&subEl.style.display!=="none")?subEl.value:"";
+  return w=>(!c||w.cat===c)&&(!sub||w.sub===sub);
+}
+function updateSubcatSelectGeneric(catId,subId){
+  const cat=document.getElementById(catId).value;
+  const subSel=document.getElementById(subId);
+  if(!subSel)return;
+  const subs=[...new Set(allWords().filter(w=>w.cat===cat&&w.sub).map(w=>w.sub))];
+  if(cat&&subs.length>1){
+    const cur=subSel.value;
+    subSel.innerHTML=`<option value="">Tüm alt gruplar</option>`+subs.map(s=>`<option value="${esc(s)}">${esc(s)}</option>`).join("");
+    subSel.value=subs.includes(cur)?cur:"";
+    subSel.style.display="";
+  }else{
+    subSel.style.display="none";
+    subSel.value="";
+  }
+}
+function updateSubcatSelect(){updateSubcatSelectGeneric("studyCat","studySub");}
+function onStudyCatChange(){
+  session=null;matchGame=null;
+  updateSubcatSelect();
+  renderStudy();
+}
+let studyMode="card";
+function setStudyMode(m){
+  if(session&&!session.finished&&session.touched&&session.touched.size>0&&session.index<session.queue.length){
+    finalizeSession("auto");
+  }
+  studyMode=m;
+  document.getElementById("modeCard").classList.toggle("active",m==="card");
+  document.getElementById("modeMatch").classList.toggle("active",m==="match");
+  session=null;matchGame=null;
+  renderStudy();
+}
+function newTodayCount(){
+  const f=catFilterFn();
+  return allWords().filter(f).filter(w=>{
+    const p=prof().progress[w.id];
+    return p&&p.firstDay===todayStr();
+  }).length;
+}
+function newLimit(){
+  const n=prof().newPerDay;
+  if(n===0)return Infinity;
+  return Math.max(0,(n||20)-newTodayCount());
+}
+function dueCounts(){
+  const f=catFilterFn();const words=allWords().filter(f);
+  let review=0;
+  words.forEach(w=>{const p=prof().progress[w.id];if(p&&p.reps>0&&p.due<=now())review++;});
+  const lim=newLimit();
+  const newPool=words.filter(w=>statusOf(w.id)==="new").length;
+  const newAvail=lim===Infinity?newPool:Math.min(lim,newPool);
+  return{newAvail,review,done:prof().history[todayStr()]||0};
+}
+function buildSession(){
+  const f=catFilterFn();const words=allWords().filter(f);
+  const dueReviews=words.filter(w=>{const p=prof().progress[w.id];return p&&p.reps>0&&p.due<=now();});
+  const lim=newLimit();
+  let newWords=words.filter(w=>statusOf(w.id)==="new");
+  if(lim!==Infinity)newWords=newWords.slice(0,lim);
+  const sizeEl=document.getElementById("sessionSize");
+  const size=sizeEl?parseInt(sizeEl.value)||0:0;
+  if(size>0){
+    // Oturum sayısı SADECE yeni kelime eklemesini sınırlar; süresi gelmiş tekrarlar asla kesilmez.
+    const newBudget=Math.max(0,size-dueReviews.length);
+    newWords=newWords.slice(0,newBudget);
+  }
+  const queue=dueReviews.concat(newWords);
+  return{queue,index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+}
+function buildExtraSession(){
+  const f=catFilterFn();
+  let words=allWords().filter(f).filter(w=>statusOf(w.id)!=="known");
+  if(words.length===0)words=allWords().filter(f);
+  words=[...words].sort(()=>Math.random()-.5);
+  const sizeEl=document.getElementById("sessionSize");
+  const size=sizeEl?parseInt(sizeEl.value)||0:0;
+  if(size>0)words=words.slice(0,size);
+  return{queue:words,index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+}
+function startExtraSession(){delete prof().lastSessionSummary;session=buildExtraSession();session.revealed=false;renderStudy();}
+function yesterdayStruggleWords(){
+  const y=new Date(Date.now()-DAY).toISOString().slice(0,10);
+  const ids=(prof().strugglingByDay&&prof().strugglingByDay[y])||[];
+  return ids.map(id=>allWords().find(w=>w.id===id)).filter(w=>w&&statusOf(w.id)!=="known");
+}
+function renderStruggleBanner(){
+  const el=document.getElementById("struggleBanner");
+  if(!el)return;
+  const y=new Date(Date.now()-DAY).toISOString().slice(0,10);
+  if(prof().dismissedStruggleDay===y){el.innerHTML="";return;}
+  const words=yesterdayStruggleWords();
+  if(!words.length){el.innerHTML="";return;}
+  const names=words.slice(0,6).map(w=>esc(w.en)).join(", ");
+  el.innerHTML=`<div class="struggle-banner">
+    <div>💭 Dün zorlandığın kelimeler: <b>${names}</b>${words.length>6?` +${words.length-6}`:""}</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="chip" onclick="startStruggleReview()">Şimdi çalış</button>
+      <button class="chip" onclick="dismissStruggleBanner()">Kapat</button>
+    </div>
+  </div>`;
+}
+function dismissStruggleBanner(){
+  const y=new Date(Date.now()-DAY).toISOString().slice(0,10);
+  prof().dismissedStruggleDay=y;saveState();renderStruggleBanner();
+}
+function startStruggleReview(){
+  const words=yesterdayStruggleWords();
+  if(!words.length){toast("Kelime bulunamadı");return;}
+  delete prof().lastSessionSummary;
+  session={queue:words,index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+  renderStudy();
+}
+function renderCountdown(){
+  const el=document.getElementById("countdownCard");
+  if(!state.examDate){
+    el.innerHTML=`<div class="cd-lbl">YDS tarihini gir, geri sayım ve günlük hedef hesaplansın</div>
+      <input type="date" id="examDateInput" onchange="setExamDate(this.value)">`;
+    return;
+  }
+  const days=Math.ceil((new Date(state.examDate)-Date.now())/DAY);
+  if(days<0){el.innerHTML=`<div class="cd-lbl">Sınav tarihi geçti — yeni tarih gir</div><input type="date" onchange="setExamDate(this.value)">`;return;}
+  const unseen=allWords().filter(w=>statusOf(w.id)==="new").length;
+  const pace=days>0?Math.ceil(unseen/days):unseen;
+  el.innerHTML=`<div><div class="cd-days">YDS'ye ${days} gün</div>
+    <div class="cd-lbl">${unseen} yeni kelime kaldı → günde ~${pace} yeni kelime</div></div>
+    <button class="chip" onclick="setExamDate(null)" aria-label="Sınav tarihini sıfırla">Değiştir</button>`;
+}
+function setExamDate(v){state.examDate=v||null;saveState();renderCountdown();}
+function summaryAdvice(s){
+  const msgs=[];
+  const pct=x=>s.total?Math.round(x/s.total*100):0;
+  if(pct(s.again)>=30)msgs.push("Kelimelerin önemli bir kısmını 'Tekrar' işaretledin — günlük yeni kelime sayısını ya da oturum kelime sayısını biraz azaltmayı düşünebilirsin.");
+  else if(pct(s.easy)>=50)msgs.push("Kelimelerin çoğunu kolay bulmuşsun — oturum kelime sayısını artırabilir ya da daha zorlayıcı bir kategoriye geçebilirsin.");
+  else msgs.push("Dengeli bir oturum geçirdin, bu tempoda devam edebilirsin.");
+  if(s.stubbornWords&&s.stubbornWords.length)msgs.push("İnatçı kelimelerin: "+s.stubbornWords.map(w=>w.en).join(", ")+" — bunlara yarın öncelik ver ya da Test'te 'İnatçı kelimelerim' havuzunu dene.");
+  return msgs;
+}
+function renderSessionSummary(){
+  const s=prof().lastSessionSummary;
+  if(!s)return"";
+  const reasonLabel=s.reason==="complete"?"Oturumu tamamladın 🎉":(s.reason==="manual"?"Oturumu bitirdin":"Oturumdan çıktın");
+  const advice=summaryAdvice(s).map(m=>`<p style="margin-top:6px">${esc(m)}</p>`).join("");
+  const reinforceBtn=(s.reinforceIds&&s.reinforceIds.length)?
+    `<button class="big-btn" style="margin-top:10px" onclick="startReinforceSession()">🔁 Bu ${s.reinforceIds.length} kelimeyi şimdi tekrar dene</button>`:"";
+  return`<div class="all-done" style="text-align:left;margin-bottom:14px;padding:22px 20px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <h3 style="margin:0">${reasonLabel}</h3>
+      <button class="chip" onclick="clearSessionSummary()" aria-label="Kapat">✕</button>
+    </div>
+    <p style="margin-top:8px">${s.total} kelime çalıştın: <b style="color:var(--red)">${s.again} tekrar</b>, <b style="color:#9A6A00">${s.hard} zor</b>, <b style="color:var(--green)">${s.good} iyi</b>, <b style="color:var(--blue)">${s.easy} kolay</b>.</p>
+    ${advice}
+    ${reinforceBtn}
+  </div>`;
+}
+function clearSessionSummary(){delete prof().lastSessionSummary;saveState();renderStudy();}
+function startReinforceSession(){
+  const s=prof().lastSessionSummary;
+  if(!s||!s.reinforceIds||!s.reinforceIds.length){toast("Pekiştirilecek kelime yok");return;}
+  const words=allWords().filter(w=>s.reinforceIds.includes(w.id));
+  delete prof().lastSessionSummary;
+  session={queue:words,index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+  renderStudy();
+}
+function finalizeSession(reason){
+  if(!session||session.finished)return;
+  session.finished=true;
+  const ids=[...(session.touched||[])];
+  if(ids.length===0){session=null;return;}
+  let again=0,hard=0,good=0,easy=0;
+  ids.forEach(id=>{const g=session.finalGrade[id];if(g===1)again++;else if(g===2)hard++;else if(g===3)good++;else if(g===4)easy++;});
+  const words=allWords();
+  const stubbornWords=ids.map(id=>words.find(w=>w.id===id)).filter(w=>w&&statusOf(w.id)==="stubborn").map(w=>({en:w.en,tr:w.tr})).slice(0,8);
+  const reinforceIds=[...(session.everStruggled||[])];
+  if(reinforceIds.length){
+    prof().strugglingByDay=prof().strugglingByDay||{};
+    const d=todayStr();
+    const existing=new Set(prof().strugglingByDay[d]||[]);
+    reinforceIds.forEach(id=>existing.add(id));
+    prof().strugglingByDay[d]=[...existing];
+  }
+  prof().lastSessionSummary={time:now(),reason,total:ids.length,again,hard,good,easy,stubbornWords,reinforceIds};
+  saveState();
+  session=null;
+}
+function renderStudy(){
+  renderStruggleBanner();
+  renderCountdown();
+  const c=dueCounts();
+  document.getElementById("dueNew").textContent=c.newAvail===Infinity?"∞":c.newAvail;
+  document.getElementById("dueReview").textContent=c.review;
+  document.getElementById("doneToday").textContent=c.done;
+  renderCatTracker();
+  if(studyMode==="match"){renderMatchGame();return;}
+  const area=document.getElementById("studyArea");
+  if(!session||session.index>=session.queue.length){
+    const summaryHtml=renderSessionSummary();
+    if(c.newAvail+c.review===0){
+      area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">🎉</div><h3>Bu kategoride tamam!</h3><p>Süresi gelen tekrar veya günlük kotan kalmadı. İstersen bu kategoriyi yine de çalışmaya devam edebilirsin — günlük planı bozmaz, sadece ekstra pratik olur.</p><button class="big-btn secondary" onclick="startExtraSession()">Yine de pratik yap</button></div>`;
+      return;
+    }
+    area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">📖</div><h3>Çalışmaya hazır mısın?</h3><p>${c.newAvail===Infinity?"Sınırsız":c.newAvail} yeni kelime ve ${c.review} tekrar seni bekliyor.</p><button class="big-btn" onclick="startSession()">Başla</button></div>`;
+    return;
+  }
+  renderCard();
+}
+function categoryBreakdown(){
+  const f=catFilterFn();
+  const words=allWords().filter(f);
+  const b={total:words.length,known:0,learning:0,new:0,stubborn:0};
+  words.forEach(w=>{b[statusOf(w.id)]++;});
+  return b;
+}
+function renderCatTracker(){
+  const el=document.getElementById("catTracker");
+  if(!el)return;
+  const b=categoryBreakdown();
+  el.innerHTML=`<span>${b.total} kelime</span>
+    <span style="color:var(--green)">${b.known} öğrenildi</span>
+    <span style="color:#9A6A00">${b.learning} öğreniliyor</span>
+    <span style="color:var(--ink-faint)">${b.new} yeni</span>
+    ${b.stubborn?`<span style="color:var(--red)">${b.stubborn} inatçı</span>`:""}`;
+}
+let matchGame=null;
+function startMatchGame(){
+  const f=catFilterFn();const words=allWords().filter(f);
+  const dueReviews=words.filter(w=>{const p=prof().progress[w.id];return p&&p.reps>0&&p.due<=now();});
+  const newW=words.filter(w=>statusOf(w.id)==="new");
+  const pool=dueReviews.concat(newW);
+  const countEl=document.getElementById("matchCount");
+  const count=countEl?parseInt(countEl.value)||6:6;
+  if(pool.length<2){toast("Bu kategoride yeterli kelime yok (en az 2 gerekli)");return;}
+  const chosen=pool.slice(0,Math.min(count,pool.length));
+  matchGame={words:chosen,left:[...chosen].sort(()=>Math.random()-.5),right:[...chosen].sort(()=>Math.random()-.5),
+    matched:new Set(),selLeft:null,selRight:null,wrong:null};
+  renderMatchGame();
+}
+function selectMatch(side,id){
+  if(!matchGame||matchGame.matched.has(id)||matchGame.wrong)return;
+  if(side==="left")matchGame.selLeft=id;else matchGame.selRight=id;
+  if(matchGame.selLeft!=null&&matchGame.selRight!=null){
+    if(matchGame.selLeft===matchGame.selRight){
+      matchGame.matched.add(matchGame.selLeft);
+      matchGame.selLeft=null;matchGame.selRight=null;
+    }else{
+      matchGame.wrong={l:matchGame.selLeft,r:matchGame.selRight};
+      setTimeout(()=>{matchGame.wrong=null;matchGame.selLeft=null;matchGame.selRight=null;renderMatchGame();},650);
+    }
+  }
+  renderMatchGame();
+}
+function renderMatchGame(){
+  const area=document.getElementById("studyArea");
+  if(!matchGame){
+    area.innerHTML=`<div class="all-done"><div class="emoji">🔗</div><h3>Eşleştirme oyunu</h3><p>Bu kategoriden kelime-anlam çiftlerini eşleştir.</p>
+      <select id="matchCount" class="cat-select"><option value="4">4 çift</option><option value="6" selected>6 çift</option><option value="8">8 çift</option><option value="10">10 çift</option></select>
+      <button class="big-btn" onclick="startMatchGame()">Başla</button></div>`;
+    return;
+  }
+  if(matchGame.matched.size===matchGame.words.length){
+    area.innerHTML=`<div class="all-done"><div class="emoji">🎉</div><h3>Hepsini eşleştirdin!</h3><p>${matchGame.words.length} çiftin tamamını doğru buldun.</p><button class="big-btn" onclick="matchGame=null;renderMatchGame();">Yeni oyun</button></div>`;
+    return;
+  }
+  const tile=(w,side)=>{
+    const isMatched=matchGame.matched.has(w.id);
+    const isSel=(side==="left"?matchGame.selLeft:matchGame.selRight)===w.id;
+    const isWrong=matchGame.wrong&&matchGame.wrong[side==="left"?"l":"r"]===w.id;
+    const label=side==="left"?w.en:w.tr;
+    return`<button class="match-tile ${isMatched?"matched":""} ${isSel?"selected":""} ${isWrong?"wrong":""}" ${isMatched?"disabled":""} onclick="selectMatch('${side}',${w.id})">${esc(label)}</button>`;
+  };
+  area.innerHTML=`<div class="match-progress">${matchGame.matched.size}/${matchGame.words.length} eşleşti</div>
+    <div class="match-grid">
+      <div class="match-col">${matchGame.left.map(w=>tile(w,"left")).join("")}</div>
+      <div class="match-col">${matchGame.right.map(w=>tile(w,"right")).join("")}</div>
+    </div>
+    <button class="big-btn secondary" style="margin-top:14px" onclick="matchGame=null;renderMatchGame();">Vazgeç</button>`;
+}
+function startSession(){delete prof().lastSessionSummary;session=buildSession();session.revealed=false;renderStudy();}
+function sessionLiveStats(){
+  const stats={again:0,hard:0,good:0,easy:0};
+  if(!session)return stats;
+  Object.values(session.finalGrade).forEach(g=>{
+    if(g===1)stats.again++;else if(g===2)stats.hard++;else if(g===3)stats.good++;else if(g===4)stats.easy++;
+  });
+  return stats;
+}
+function cardVariant(w){
+  const p=prof().progress[w.id];
+  const reps=p?p.reps:0;
+  return(reps>=1&&clozeOk(w))?"cloze":"reveal";
+}
+function cardHeaderHtml(w,st){
+  return`<span class="level-tag">${esc(w.level)} · ${esc(getCats()[w.cat]||w.cat)}${st==="new"?" · yeni":""}</span>
+    <span class="pos-tag">${esc(w.pos||"")}</span>`;
+}
+function lapseFlagHtml(p){
+  return(p&&(p.lapses||0)>=STUBBORN_LAPSES)?`<span class="lapse-flag">🔥 inatçı (${p.lapses}×)</span>`:"";
+}
+function cardBackHtml(w){
+  const ex=currentExample(w)||{en:"",tr:""};
+  return`<div class="card-back">
+    <div class="meaning">${esc(w.tr)}</div>
+    ${w.syn?`<div class="syn-line">≈ <b>${esc(w.syn)}</b></div>`:""}
+    ${ex.en?`<div class="example">"${esc(ex.en)}"</div>`:""}
+    ${ex.tr?`<div class="example-tr">${esc(ex.tr)}</div>`:""}
+  </div>`;
+}
+function renderRevealFront(w,revealed,st,p){
+  let html=`<div class="flashcard">${cardHeaderHtml(w,st)}
+    <div class="headword ${revealed?"marked":""}">${esc(w.en)}</div>
+    ${w.ipa?`<div class="ipa">${esc(w.ipa)}</div>`:""}
+    <button class="speak-btn" onclick="event.stopPropagation();speak('${jsq(w.en)}')" aria-label="Sesli oku">🔊</button>
+    ${lapseFlagHtml(p)}`;
+  html+=revealed?cardBackHtml(w):`<div class="reveal-hint">Anlamı görmek için dokun</div>`;
+  html+=`</div>`;
+  return html;
+}
+function hintHtml(w){
+  const lvl=(session.hintLevel&&session.hintLevel[w.id])||0;
+  if(lvl===0)return"";
+  const letters=w.en.replace(/[^a-zA-Z]/g,"").slice(0,lvl).toUpperCase().split("").join(" ");
+  return`<div class="hint-text">İpucu: <b>${esc(letters)}</b>${lvl>=3?" (maksimum)":""}</div>`;
+}
+function showHint(){
+  if(!session.hintLevel)session.hintLevel={};
+  const w=session.queue[session.index];
+  const cur=session.hintLevel[w.id]||0;
+  if(cur<3)session.hintLevel[w.id]=cur+1;
+  renderCard();
+}
+function renderClozeFront(w,revealed,st,p){
+  let html=`<div class="flashcard">${cardHeaderHtml(w,st)}`;
+  if(!revealed){
+    const lvl=(session.hintLevel&&session.hintLevel[w.id])||0;
+    html+=`<div class="cloze-prompt">${esc(clozeSentence(w))}</div>
+      <div class="reveal-hint">Boşluğa gelecek kelimeyi tahmin et, görmek için dokun</div>
+      ${hintHtml(w)}
+      <button class="chip hint-btn" onclick="event.stopPropagation();showHint()" ${lvl>=3?"disabled":""}>💡 İpucu (en fazla 3 harf)</button>`;
+  }else{
+    html+=`<div class="headword marked">${esc(w.en)}</div>
+      ${w.ipa?`<div class="ipa">${esc(w.ipa)}</div>`:""}
+      <button class="speak-btn" onclick="event.stopPropagation();speak('${jsq(w.en)}')" aria-label="Sesli oku">🔊</button>
+      ${lapseFlagHtml(p)}
+      ${cardBackHtml(w)}`;
+  }
+  html+=`</div>`;
+  return html;
+}
+function renderCard(){
+  const w=session.queue[session.index];
+  const area=document.getElementById("studyArea");
+  const st=statusOf(w.id);
+  const p=prof().progress[w.id];
+  const variant=cardVariant(w);
+  const pct=session.queue.length?Math.round((session.index/session.queue.length)*100):0;
+  const s=sessionLiveStats();
+  let html=`<div class="session-progress"><div class="session-progress-fill" style="width:${pct}%"></div></div>
+    <div class="session-stats">
+      <span>${session.index+1}/${session.queue.length}</span>
+      <span style="color:var(--red)">${s.again} tekrar</span>
+      <span style="color:#9A6A00">${s.hard} zor</span>
+      <span style="color:var(--green)">${s.good} iyi</span>
+      <span style="color:var(--blue)">${s.easy} kolay</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+      <button class="chip" onclick="finalizeSession('manual');renderStudy();">Oturumu bitir</button>
+    </div>`;
+  if(variant==="cloze")html+=renderClozeFront(w,session.revealed,st,p);
+  else html+=renderRevealFront(w,session.revealed,st,p);
+  if(session.revealed){
+    html+=`<div class="grade-row">
+      <button class="grade-btn again" onclick="doGrade(1)">Tekrar<span class="sub">&lt;10 dk</span></button>
+      <button class="grade-btn hard" onclick="doGrade(2)">Zor<span class="sub">${intervalPreview(w.id,2)}</span></button>
+      <button class="grade-btn good" onclick="doGrade(3)">İyi<span class="sub">${intervalPreview(w.id,3)}</span></button>
+      <button class="grade-btn easy" onclick="doGrade(4)">Kolay<span class="sub">${intervalPreview(w.id,4)}</span></button>
+    </div>`;
+  }
+  area.innerHTML=html;
+  if(!session.revealed){
+    area.querySelector(".flashcard").addEventListener("click",e=>{
+      if(e.target.closest(".speak-btn")||e.target.closest(".hint-btn"))return;
+      session.revealed=true;renderCard();
+    });
+  }
+}
+function intervalPreview(id,g){
+  const p=getProg(id);let iv=1;
+  if(g===2)iv=p.interval===0?1:Math.max(1,Math.round(p.interval*1.2));
+  if(g===3)iv=p.interval===0?1:Math.round(p.interval*p.ease);
+  if(g===4)iv=p.interval===0?3:Math.round(p.interval*p.ease*1.3);
+  return iv===1?"1 gün":iv+" gün";
+}
+function requeueWithinSession(w,minGap,maxGap){
+  const offset=minGap+Math.floor(Math.random()*(maxGap-minGap+1));
+  const insertAt=Math.min(session.queue.length,session.index+offset);
+  session.queue.splice(insertAt,0,w);
+}
+function doGrade(g){
+  const w=session.queue[session.index];
+  session.touched.add(w.id);
+  session.finalGrade[w.id]=g;
+  if(g===1||g===2)session.everStruggled.add(w.id);
+  grade(w.id,g);
+  if(g===1)session.queue.push(w);
+  else if(g===2)requeueWithinSession(w,5,8);
+  session.index++;session.revealed=false;
+  session.typedCorrect=undefined;
+  if(session.index>=session.queue.length)finalizeSession("complete");
+  renderStudy();
+}
+
+/* ================= QUIZ ================= */
+let quiz=null;
+function seenWords(){return allWords().filter(w=>{const p=prof().progress[w.id];return p&&p.reps>0;});}
+function renderQuizHome(){
+  const area=document.getElementById("quizArea");
+  if(quiz&&quiz.index<quiz.qs.length){renderQuizQ();return;}
+  area.innerHTML=`<div class="quiz-setup">
+    <label for="qMode">Soru tipi</label>
+    <select id="qMode">
+      <option value="mix">Karışık (YDS provası)</option>
+      <option value="meaning">Anlam seçme (EN↔TR)</option>
+      <option value="cloze">Cümlede boşluk (cloze)</option>
+      <option value="syn">Eş anlam (synonym)</option>
+      <option value="type">Yazarak cevap (TR→EN)</option>
+    </select>
+    <label for="qScope">Kelime havuzu</label>
+    <select id="qScope">
+      <option value="seen">Gördüklerim</option>
+      <option value="all">Tüm kelimeler</option>
+      <option value="stubborn">İnatçı kelimelerim 🔥</option>
+    </select>
+    <label for="qCat">Kategori</label>
+    <select id="qCat" onchange="updateQuizSubcatSelect()"></select>
+    <select id="qSub" class="cat-select" style="display:none;margin-top:8px" aria-label="Alt grup seçimi"></select>
+    <button class="big-btn" onclick="startQuiz()">Testi başlat (10 soru)</button>
+  </div>`;
+  populateCategorySelects();
+  updateQuizSubcatSelect();
+}
+function updateQuizSubcatSelect(){updateSubcatSelectGeneric("qCat","qSub");}
+function startQuiz(){
+  const mode=document.getElementById("qMode").value;
+  const scope=document.getElementById("qScope").value;
+  const cat=document.getElementById("qCat").value;
+  const subSel=document.getElementById("qSub");
+  const sub=(subSel&&subSel.style.display!=="none")?subSel.value:"";
+  function buildPool(useCat,useSub){
+    let p=scope==="all"?allWords():scope==="stubborn"?allWords().filter(w=>statusOf(w.id)==="stubborn"):seenWords();
+    if(useCat&&cat)p=p.filter(w=>w.cat===cat);
+    if(useSub&&sub)p=p.filter(w=>w.sub===sub);
+    if(mode==="syn")p=p.filter(w=>w.syn);
+    if(mode==="cloze")p=p.filter(clozeOk);
+    return p;
+  }
+  let pool=buildPool(true,true);
+  let widened=false;
+  if(pool.length<4&&(cat||sub)){pool=buildPool(false,false);widened=true;}
+  if(pool.length<4){
+    toast(mode==="syn"?"Bu havuzda eş anlamlı kaydı olan yeterli kelime yok (en az 4 gerekli)":"Bu seçimle yeterli kelime yok (en az 4 gerekli)");
+    return;
+  }
+  if(widened)toast("Bu seçimde yeterli kelime yoktu — tüm kategorilerden soruldu");
+  const shuffled=[...pool].sort(()=>Math.random()-.5);
+  const all=allWords();
+  const qs=shuffled.slice(0,Math.min(10,shuffled.length)).map(w=>{
+    let type=mode;
+    if(mode==="mix"){
+      const opts=["meaning","cloze","syn","type"].filter(t=>(t!=="syn"||w.syn)&&(t!=="cloze"||clozeOk(w)));
+      type=opts[Math.floor(Math.random()*opts.length)];
+    }
+    const q={w,type,answered:null};
+    if(type==="meaning"){
+      q.dir=Math.random()<0.5?"entr":"tren";
+      const others=all.filter(x=>x.id!==w.id&&x.tr!==w.tr).sort(()=>Math.random()-.5).slice(0,3);
+      q.opts=[w,...others].sort(()=>Math.random()-.5);
+    }
+    if(type==="cloze"){
+      const sameCat=all.filter(x=>x.id!==w.id&&x.cat===w.cat);
+      const others=(sameCat.length>=3?sameCat:all.filter(x=>x.id!==w.id)).sort(()=>Math.random()-.5).slice(0,3);
+      q.opts=[w,...others].sort(()=>Math.random()-.5);
+    }
+    if(type==="syn"){
+      const withSyn=all.filter(x=>x.id!==w.id&&x.syn);
+      const others=withSyn.sort(()=>Math.random()-.5).slice(0,3);
+      q.opts=[w,...others].sort(()=>Math.random()-.5);
+    }
+    return q;
+  });
+  quiz={qs,index:0,correct:0};
+  renderQuizQ();
+}
+function firstSyn(w){return w.syn.split(",")[0].trim();}
+function wordExamples(w){
+  const list=[];
+  if(w.ex)list.push({en:w.ex,tr:w.exTr||""});
+  if(w.ex2)list.push({en:w.ex2,tr:w.exTr2||""});
+  if(w.ex3)list.push({en:w.ex3,tr:w.exTr3||""});
+  return list;
+}
+function blankOut(en,headword){
+  const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  let re=new RegExp("\\b"+escRe(headword)+"\\b","i");
+  if(re.test(en))return en.replace(re,"_____");
+  const stemmed=headword.split(/\s+/).map(t=>{
+    let s=t.replace(/(y|e)$/i,"");
+    if(s.length<3)s=t;
+    return escRe(s)+"\\w*";
+  }).join("\\s+");
+  re=new RegExp("\\b"+stemmed,"i");
+  if(re.test(en))return en.replace(re,"_____");
+  return null;
+}
+function currentExample(w){
+  const exs=wordExamples(w);
+  if(exs.length===0)return null;
+  const p=prof().progress[w.id];
+  const ptr=(p&&p.exIdx)?p.exIdx:0;
+  return exs[ptr%exs.length];
+}
+function clozeSentence(w){
+  const ex=currentExample(w);
+  if(!ex)return"";
+  return blankOut(ex.en,w.en)||ex.en;
+}
+function clozeOk(w){
+  const ex=currentExample(w);
+  if(!ex)return false;
+  return blankOut(ex.en,w.en)!==null;
+}
+function renderQuizQ(){
+  const area=document.getElementById("quizArea");
+  const q=quiz.qs[quiz.index];
+  const progress=quiz.qs.map((x,i)=>{
+    let cls="";
+    if(i<quiz.index)cls=x.answered?"done":"wrong";
+    else if(i===quiz.index)cls="current";
+    return`<span class="${cls}"></span>`;
+  }).join("");
+  let body="";
+  if(q.type==="meaning"){
+    const prompt=q.dir==="entr"?q.w.en:q.w.tr;
+    const dirLabel=q.dir==="entr"?"İngilizce → Türkçe":"Türkçe → İngilizce";
+    const opts=q.opts.map((o,i)=>`<button class="quiz-opt" id="opt${i}" onclick="answerMC(${i})">${esc(q.dir==="entr"?o.tr:o.en)}</button>`).join("");
+    body=`<div class="quiz-q"><div class="direction">${dirLabel}</div><div class="word">${esc(prompt)}</div></div><div class="quiz-opts">${opts}</div>
+      <div class="skip-row">
+      <button class="big-btn secondary qaction-btn" onclick="skipQuestion()">Bilmiyorum</button>
+      <button class="big-btn secondary qaction-btn" onclick="passQuestion()">Pas geç (sonra dön)</button>
+    </div>`;
+  }
+  if(q.type==="cloze"){
+    const opts=q.opts.map((o,i)=>`<button class="quiz-opt" id="opt${i}" onclick="answerMC(${i})">${esc(o.en)}</button>`).join("");
+    body=`<div class="quiz-q"><div class="direction">Cümlede boşluk</div><div class="cloze">${esc(clozeSentence(q.w)).replace("_____","<b>_____</b>")}</div></div><div class="quiz-opts">${opts}</div>
+      <div class="skip-row">
+      <button class="big-btn secondary qaction-btn" onclick="skipQuestion()">Bilmiyorum</button>
+      <button class="big-btn secondary qaction-btn" onclick="passQuestion()">Pas geç (sonra dön)</button>
+    </div>`;
+  }
+  if(q.type==="syn"){
+    const opts=q.opts.map((o,i)=>`<button class="quiz-opt" id="opt${i}" onclick="answerMC(${i})">${esc(firstSyn(o))}</button>`).join("");
+    body=`<div class="quiz-q"><div class="direction">En yakın anlamlı (synonym)</div><div class="word">${esc(q.w.en)}</div></div><div class="quiz-opts">${opts}</div>
+      <div class="skip-row">
+      <button class="big-btn secondary qaction-btn" onclick="skipQuestion()">Bilmiyorum</button>
+      <button class="big-btn secondary qaction-btn" onclick="passQuestion()">Pas geç (sonra dön)</button>
+    </div>`;
+  }
+  if(q.type==="type"){
+    body=`<div class="quiz-q"><div class="direction">Türkçe → İngilizce · yaz</div><div class="word">${esc(q.w.tr)}</div>
+      <div style="margin-top:6px;font-size:.78rem;color:var(--ink-faint)">${esc(getCats()[q.w.cat]||"")} · ${esc(q.w.level)}</div></div>
+      <div class="type-row"><input id="typeInput" autocomplete="off" autocapitalize="off" placeholder="İngilizcesini yaz..." onkeydown="if(event.key==='Enter')answerType()"><button onclick="answerType()">Kontrol</button></div>
+      <div id="typeFeedback"></div>
+      <div class="skip-row">
+      <button class="big-btn secondary qaction-btn" onclick="skipQuestion()">Bilmiyorum</button>
+      <button class="big-btn secondary qaction-btn" onclick="passQuestion()">Pas geç (sonra dön)</button>
+    </div>`;
+  }
+  area.innerHTML=`<div class="quiz-progress">${progress}</div>`+body;
+  if(q.type==="type")setTimeout(()=>{const i=document.getElementById("typeInput");if(i)i.focus();},100);
+}
+function nextQ(delay){
+  setTimeout(()=>{
+    quiz.index++;
+    if(quiz.index>=quiz.qs.length)renderQuizResult();
+    else renderQuizQ();
+  },delay);
+}
+function skipQuestion(){
+  const q=quiz.qs[quiz.index];
+  if(q.locked)return;
+  q.locked=true;
+  q.answered=false;
+  q.dontKnow=true;
+  if(q.opts){
+    q.opts.forEach((o,j)=>{
+      const btn=document.getElementById("opt"+j);
+      if(!btn)return;
+      if(o.id===q.w.id)btn.classList.add("correct");
+      btn.disabled=true;
+    });
+  }else{
+    const fb=document.getElementById("typeFeedback");
+    if(fb)fb.innerHTML=`<div class="type-feedback no">Doğrusu: <b>${esc(q.w.en)}</b></div>`;
+  }
+  document.querySelectorAll(".qaction-btn").forEach(b=>b.disabled=true);
+  nextQ(1200);
+}
+function passQuestion(){
+  const q=quiz.qs[quiz.index];
+  if(q.locked)return;
+  if(q.passed){toast("Bu soruyu zaten bir kez erteledin — şimdi cevaplaman ya da 'Bilmiyorum' demen gerekiyor");return;}
+  q.passed=true;
+  quiz.qs.splice(quiz.index,1);
+  quiz.qs.push(q);
+  renderQuizQ();
+}
+function answerMC(i){
+  const q=quiz.qs[quiz.index];
+  if(q.locked)return;q.locked=true;
+  const correct=q.opts[i].id===q.w.id;
+  q.answered=correct;
+  if(correct)quiz.correct++;
+  q.opts.forEach((o,j)=>{
+    const btn=document.getElementById("opt"+j);
+    if(o.id===q.w.id)btn.classList.add("correct");
+    else if(j===i)btn.classList.add("wrong");
+    btn.disabled=true;
+  });
+  document.querySelectorAll(".qaction-btn").forEach(b=>b.disabled=true);
+  nextQ(950);
+}
+function normalizeAnswer(s){return s.toLowerCase().trim().replace(/\s+/g," ");}
+function answerType(){
+  const q=quiz.qs[quiz.index];
+  if(q.locked)return;
+  const val=normalizeAnswer(document.getElementById("typeInput").value);
+  if(!val)return;
+  q.locked=true;
+  const correct=val===normalizeAnswer(q.w.en);
+  q.answered=correct;
+  if(correct)quiz.correct++;
+  const fb=document.getElementById("typeFeedback");
+  fb.innerHTML=correct
+    ?`<div class="type-feedback ok">Doğru ✓ — ${esc(q.w.en)}</div>`
+    :`<div class="type-feedback no">Doğrusu: <b>${esc(q.w.en)}</b></div>`;
+  document.querySelectorAll(".qaction-btn").forEach(b=>b.disabled=true);
+  nextQ(correct?800:1700);
+}
+function renderQuizResult(){
+  const area=document.getElementById("quizArea");
+  const total=quiz.qs.length;
+  const pct=Math.round(quiz.correct/total*100);
+  let msg=pct===100?"Mükemmel! 🏆":pct>=70?"Çok iyi gidiyorsun 👏":pct>=40?"Fena değil — yanlışlar Öğren'de karşına çıkacak":"Öğren sekmesine biraz daha zaman ayır";
+  const dontKnowWords=quiz.qs.filter(q=>q.dontKnow).map(q=>q.w);
+  let reviewHtml="";
+  if(dontKnowWords.length){
+    reviewHtml=`<div style="margin-top:18px;text-align:left">
+      <h3 style="font-family:'Source Serif 4',serif;font-size:1.05rem;margin-bottom:10px">Bilmediğin ${dontKnowWords.length} kelime</h3>
+      ${dontKnowWords.map(w=>{
+        const ex=currentExample(w);
+        return`<div class="mini-flashcard">
+          <div class="mini-en">${esc(w.en)}</div>
+          <div class="mini-tr">${esc(w.tr)}</div>
+          ${w.syn?`<div class="syn-line">≈ <b>${esc(w.syn)}</b></div>`:""}
+          ${ex&&ex.en?`<div class="example">"${esc(ex.en)}"</div>`:""}
+          ${ex&&ex.tr?`<div class="example-tr">${esc(ex.tr)}</div>`:""}
+        </div>`;
+      }).join("")}
+    </div>`;
+  }
+  area.innerHTML=`<div class="quiz-result">
+    <div class="score">${quiz.correct}<small>/${total}</small></div>
+    <p style="margin-top:8px;color:var(--ink-soft)">${msg}</p>
+    <button class="big-btn" onclick="quiz=null;renderQuizHome()">Yeni test</button>
+  </div>${reviewHtml}`;
+  quiz.index=quiz.qs.length;
+}
+
+/* ================= WORD LIST ================= */
+let catFilter="";
+let statusFilter="";
+function setStatusFilter(s){statusFilter=s;renderWordList();}
+function statusCounts(){
+  const c={new:0,learning:0,known:0,stubborn:0};
+  allWords().forEach(w=>c[statusOf(w.id)]++);
+  return c;
+}
+function renderStatusLegend(){
+  const c=statusCounts();
+  const items=[
+    {key:"",label:"Tümü",dot:null,count:allWords().length},
+    {key:"new",label:"Yeni",dot:"var(--line)",count:c.new},
+    {key:"learning",label:"Öğreniliyor",dot:"var(--marker)",count:c.learning},
+    {key:"known",label:"Öğrenildi",dot:"var(--green)",count:c.known},
+    {key:"stubborn",label:"İnatçı",dot:"var(--red)",count:c.stubborn}
+  ];
+  document.getElementById("statusLegend").innerHTML=items.map(it=>
+    `<button class="chip ${statusFilter===it.key?"active":""}" onclick="setStatusFilter('${it.key}')">${it.dot?`<i class="legend-dot" style="background:${it.dot}"></i>`:""}${it.label} (${it.count})</button>`
+  ).join("");
+}
+function renderCatChips(matchCats){
+  matchCats=matchCats||new Set();
+  const counts={};
+  allWords().forEach(w=>counts[w.cat]=(counts[w.cat]||0)+1);
+  let html=`<button class="chip ${catFilter===""?"active":""}" onclick="setCat('')">Tümü</button>`;
+  const cats=getCats();
+  Object.keys(cats).forEach(c=>{
+    if(!counts[c])return;
+    html+=`<button class="chip ${catFilter===c?"active":""} ${matchCats.has(c)?"hit":""}" onclick="setCat('${c}')">${esc(cats[c])} (${counts[c]})</button>`;
+  });
+  document.getElementById("catChips").innerHTML=html;
+}
+function setCat(c){catFilter=c;renderWordList();}
+let expandedWords=new Set();
+function toggleWordDetail(id){
+  if(expandedWords.has(id))expandedWords.delete(id);
+  else expandedWords.add(id);
+  renderWordList();
+}
+function clearWordSearch(){
+  document.getElementById("wordSearch").value="";
+  renderWordList();
+}
+function renderWordList(){
+  renderStatusLegend();
+  const rawQ=document.getElementById("wordSearch").value||"";
+  const q=rawQ.toLowerCase();
+  const clearBtn=document.getElementById("wordSearchClear");
+  if(clearBtn)clearBtn.style.display=rawQ?"":"none";
+  let matchCats=new Set();
+  if(catFilter===""&&q){
+    allWords().forEach(w=>{
+      if((w.en.toLowerCase().includes(q)||w.tr.toLowerCase().includes(q))&&(!statusFilter||statusOf(w.id)===statusFilter))matchCats.add(w.cat);
+    });
+  }
+  renderCatChips(matchCats);
+  const list=allWords().filter(w=>
+    (!catFilter||w.cat===catFilter)&&
+    (!q||w.en.toLowerCase().includes(q)||w.tr.toLowerCase().includes(q))&&
+    (!statusFilter||statusOf(w.id)===statusFilter)
+  );
+  document.getElementById("countLine").textContent=list.length+" kelime gösteriliyor · toplam "+allWords().length;
+  document.getElementById("wordList").innerHTML=list.slice(0,300).map(w=>{
+    const st=statusOf(w.id);
+    const expanded=expandedWords.has(w.id);
+    let detail="";
+    if(expanded){
+      const parts=[];
+      if(w.pos)parts.push(`<span class="pos">${esc(w.pos)}</span>`);
+      const exs=wordExamples(w);
+      exs.forEach(ex=>{
+        parts.push(`<div class="example">"${esc(ex.en)}"</div>`);
+        if(ex.tr)parts.push(`<div class="example-tr">${esc(ex.tr)}</div>`);
+      });
+      if(w.syn)parts.push(`<div class="syn-line">≈ <b>${esc(w.syn)}</b></div>`);
+      if(exs.length===0&&!w.syn)parts.push(`<div class="empty">Örnek cümle veya eş anlamlı kayıtlı değil.</div>`);
+      detail=`<div class="wr-detail">${parts.join("")}</div>`;
+    }
+    return`<div class="word-item ${expanded?"expanded":""}">
+      <div class="word-row" onclick="toggleWordDetail(${w.id})">
+        <span class="wr-status ${st}"></span>
+        <div class="wr-main">
+          <div class="wr-en">${esc(w.en)}</div>
+          <div class="wr-tr">${esc(w.tr)}</div>
+        </div>
+        <span class="wr-level">${esc(w.level)}</span>
+        <button class="wr-speak" onclick="event.stopPropagation();speak('${jsq(w.en)}')" aria-label="${esc(w.en)} sesli oku">🔊</button>
+      </div>
+      ${detail}
+    </div>`;
+  }).join("")||`<p style="color:var(--ink-faint);text-align:center;padding:20px">Sonuç bulunamadı.</p>`;
+}
+function nextId(){return Math.max(1000,...allWords().map(w=>w.id))+1;}
+function normText(s){return(s||"").toLowerCase().trim().replace(/\s+/g," ");}
+function findExistingByEn(en){
+  const key=normText(en);
+  return allWords().find(w=>normText(w.en)===key);
+}
+function exampleAlreadyPresent(existing,ex){
+  if(!ex)return true;
+  const key=normText(ex);
+  return wordExamples(existing).some(e=>normText(e.en)===key);
+}
+function synAlreadyPresent(existing,syn){
+  if(!syn)return true;
+  return(existing.syn||"").toLowerCase().includes(syn.toLowerCase().trim());
+}
+function classifyCandidate(en,tr,ex,syn){
+  const existing=findExistingByEn(en);
+  if(!existing)return{type:"new"};
+  const sameMeaning=normText(existing.tr)===normText(tr);
+  if(!sameMeaning)return{type:"conflict",existing};
+  const exNew=!exampleAlreadyPresent(existing,ex);
+  const synNew=!synAlreadyPresent(existing,syn);
+  if(!exNew&&!synNew)return{type:"exact",existing};
+  if(existing.custom)return{type:"mergeable",existing,exNew,synNew};
+  return{type:"builtin_dup",existing,exNew,synNew};
+}
+function mergeIntoCustomWord(existing,ex,exTr,syn){
+  if(ex&&!exampleAlreadyPresent(existing,ex)){
+    if(!existing.ex){existing.ex=ex;existing.exTr=exTr||"";}
+    else if(!existing.ex2){existing.ex2=ex;existing.exTr2=exTr||"";}
+    else if(!existing.ex3){existing.ex3=ex;existing.exTr3=exTr||"";}
+  }
+  if(syn&&!synAlreadyPresent(existing,syn)){
+    existing.syn=existing.syn?(existing.syn+", "+syn):syn;
+  }
+}
+function clearAddForm(){
+  ["addEn","addTr","addEx","addSyn"].forEach(i=>{const el=document.getElementById(i);if(el)el.value="";});
+}
+function addWord(){
+  const en=document.getElementById("addEn").value.trim();
+  const tr=document.getElementById("addTr").value.trim();
+  const ex=document.getElementById("addEx").value.trim();
+  const syn=document.getElementById("addSyn")?document.getElementById("addSyn").value.trim():"";
+  const level=document.getElementById("addLevel").value;
+  const cat=document.getElementById("addCat").value||"ozel";
+  if(!en||!tr){toast("İngilizce ve Türkçe alanları zorunlu");return;}
+  const c=classifyCandidate(en,tr,ex,syn);
+  if(c.type==="exact"){
+    toast(`"${en}" zaten ekli — aynı anlam ve içerikle, eklenmedi`);
+    return;
+  }
+  if(c.type==="mergeable"){
+    mergeIntoCustomWord(c.existing,ex,"",syn);
+    saveState();
+    toast(`"${en}" zaten vardı — yeni örnek/eş anlamlı mevcut kayda eklendi ✓`);
+    clearAddForm();renderWordList();
+    return;
+  }
+  if(c.type==="builtin_dup"){
+    if(!confirm(`"${en}" hazır destede zaten var ("${c.existing.tr}"). Uygulama hazır desteyi değiştiremez — yeni örneği eklemek için Claude'a söylemen gerekir. Yine de ayrı bir not olarak eklensin mi?`))return;
+  }
+  if(c.type==="conflict"){
+    if(!confirm(`"${en}" farklı bir anlamla zaten ekli: "${c.existing.tr}". Bu farklı anlamıyla yine de eklensin mi?`))return;
+  }
+  state.customWords.push({id:nextId(),en,tr,ex,syn,level,cat,custom:true});
+  saveState();
+  clearAddForm();
+  toast("Kelime eklendi ✓");
+  renderWordList();
+}
+
+/* ================= IMPORT (PDF / CSV / paste) ================= */
+let pendingPairs=[];
+function togglePaste(){
+  const ta=document.getElementById("pasteArea");
+  const btn=document.getElementById("parsePasteBtn");
+  const show=ta.style.display!=="block";
+  ta.style.display=show?"block":"none";
+  btn.style.display=show?"block":"none";
+}
+function parsePaste(){
+  const text=document.getElementById("pasteArea").value;
+  const pairs=extractPairs(text);
+  showPreview(pairs);
+}
+function handleCsv(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const lines=r.result.split(/\r?\n/);
+    const pairs=[];
+    lines.forEach(l=>{
+      const parts=l.split(/[;,]|\t/).map(s=>s.trim().replace(/^"|"$/g,""));
+      if(parts.length>=2&&parts[0]&&parts[1]&&/^[A-Za-z][A-Za-z '\-]*$/.test(parts[0]))
+        pairs.push({en:parts[0],tr:parts[1]});
+    });
+    showPreview(pairs);
+  };
+  r.readAsText(file);ev.target.value="";
+}
+function handlePdf(ev){
+  const file=ev.target.files[0];if(!file)return;
+  toast("PDF okunuyor...");
+  loadPdfJs().then(()=>{
+    const r=new FileReader();
+    r.onload=async()=>{
+      try{
+        const pdf=await pdfjsLib.getDocument({data:new Uint8Array(r.result)}).promise;
+        let text="";
+        for(let i=1;i<=pdf.numPages;i++){
+          const page=await pdf.getPage(i);
+          const content=await page.getTextContent();
+          let lastY=null,line="";
+          content.items.forEach(it=>{
+            const y=Math.round(it.transform[5]);
+            if(lastY!==null&&Math.abs(y-lastY)>3){text+=line+"\n";line="";}
+            line+=(line?" ":"")+it.str;
+            lastY=y;
+          });
+          text+=line+"\n";
+        }
+        const pairs=extractPairs(text);
+        if(pairs.length===0)toast("Bu PDF'te kelime çifti bulunamadı — taranmış olabilir");
+        showPreview(pairs);
+      }catch(e){toast("PDF okunamadı: "+e.message);}
+    };
+    r.readAsArrayBuffer(file);
+  }).catch(()=>toast("PDF kütüphanesi yüklenemedi — internet bağlantısı gerekli"));
+  ev.target.value="";
+}
+let pdfJsPromise=null;
+function loadPdfJs(){
+  if(window.pdfjsLib)return Promise.resolve();
+  if(pdfJsPromise)return pdfJsPromise;
+  pdfJsPromise=new Promise((res,rej)=>{
+    const s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    s.onload=()=>{
+      pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      res();
+    };
+    s.onerror=rej;
+    document.head.appendChild(s);
+  });
+  return pdfJsPromise;
+}
+function extractPairs(text){
+  const pairs=[];const seenInBatch=new Set();
+  text.split(/\r?\n/).forEach(raw=>{
+    let l=raw.replace(/^\s*[\d]+[.)]?\s*/,"").replace(/^[•\-–*]\s*/,"").trim();
+    if(!l||l.length>140)return;
+    let parts=null;
+    for(const sep of [/\t+/, / {2,}/, /\s+[-–—]\s+/, /\s*:\s+/]){
+      const p=l.split(sep);
+      if(p.length>=2&&p[0].trim()&&p.slice(1).join(" ").trim()){parts=[p[0].trim(),p.slice(1).join(" ").trim()];break;}
+    }
+    if(!parts)return;
+    const[en,tr]=parts;
+    if(!/^[A-Za-z][A-Za-z '\-\/()]*$/.test(en))return;
+    if(en.split(" ").length>5)return;
+    if(!/[a-zçğıöşüA-ZÇĞİÖŞÜ]/.test(tr))return;
+    const key=en.toLowerCase();
+    if(seenInBatch.has(key))return;
+    seenInBatch.add(key);
+    pairs.push({en,tr});
+  });
+  return pairs;
+}
+function showPreview(pairs){
+  pendingPairs=pairs;
+  const area=document.getElementById("previewArea");
+  if(pairs.length===0){area.innerHTML="";return;}
+  let dupCount=0;
+  let rows=pairs.map((p,i)=>{
+    const c=classifyCandidate(p.en,p.tr,null,null);
+    let badge="",checked="checked";
+    if(c.type==="exact"){
+      badge=`<div class="dup-badge dup-exact">⚠ Zaten var: "${esc(c.existing.tr)}" — atlanacak</div>`;
+      checked="";dupCount++;
+    }else if(c.type==="conflict"){
+      badge=`<div class="dup-badge dup-conflict">⚠ Farklı anlamla zaten var: "${esc(c.existing.tr)}"</div>`;
+    }
+    return`<div class="preview-row">
+    <input type="checkbox" id="pv${i}" ${checked}>
+    <input type="text" id="pvEn${i}" value="${esc(p.en)}">
+    <input type="text" id="pvTr${i}" value="${esc(p.tr)}">
+  </div>${badge}`;
+  }).join("");
+  area.innerHTML=`<div class="preview-meta">
+      <strong>${pairs.length} çift bulundu</strong>${dupCount?` <span style="color:var(--ink-faint);font-size:.78rem">(${dupCount} zaten var, işareti kaldırıldı)</span>`:""}
+      <select id="pvLevel"><option>A2</option><option>B1</option><option selected>B2</option><option>C1</option></select>
+      <select id="pvCat" onchange="handleNewCatOption('pvCat')"></select>
+    </div>${rows}
+    <button class="big-btn" onclick="commitImport()">Seçilenleri içe aktar</button>
+    <button class="big-btn secondary" onclick="pendingPairs=[];document.getElementById('previewArea').innerHTML=''">Vazgeç</button>`;
+  populateCategorySelects();
+}
+function commitImport(){
+  const level=document.getElementById("pvLevel").value;
+  const cat=document.getElementById("pvCat").value||"ozel";
+  let added=0;
+  pendingPairs.forEach((p,i)=>{
+    if(!document.getElementById("pv"+i).checked)return;
+    const en=document.getElementById("pvEn"+i).value.trim();
+    const tr=document.getElementById("pvTr"+i).value.trim();
+    if(!en||!tr)return;
+    state.customWords.push({id:nextId(),en,tr,ex:"",level,cat,custom:true});
+    added++;
+  });
+  saveState();
+  pendingPairs=[];
+  document.getElementById("previewArea").innerHTML="";
+  toast(added+" kelime eklendi ✓");
+  renderWordList();
+}
+
+/* ================= PROFILE ================= */
+function last7(profKey){
+  const h=state.profiles[profKey].history;let sum=0;
+  for(let i=0;i<7;i++){
+    const key=new Date(Date.now()-i*DAY).toISOString().slice(0,10);
+    sum+=h[key]||0;
+  }
+  return sum;
+}
+function renderProfile(){
+  const pr=prof();
+  document.getElementById("profileTitle").textContent=state.profile==="emir"?"Emir'in Profili":"İrem'in Profili";
+  let streak=pr.streak;
+  const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);
+  if(pr.lastStudyDay!==todayStr()&&pr.lastStudyDay!==yest)streak=0;
+  document.getElementById("stStreak").textContent=streak+" 🔥";
+  let known=0,learning=0,stubborn=0;
+  allWords().forEach(w=>{const s=statusOf(w.id);if(s==="known")known++;else if(s==="learning")learning++;else if(s==="stubborn")stubborn++;});
+  document.getElementById("stKnown").textContent=known;
+  document.getElementById("stLearning").textContent=learning+stubborn;
+  document.getElementById("stStubborn").textContent=stubborn;
+  document.getElementById("newPerDay").value=pr.newPerDay;
+  // düello
+  const e7=last7("emir"),i7=last7("irem");
+  const max=Math.max(e7,i7,1);
+  let duelMsg=e7===i7?"Berabere — ikiniz de aynı tempodasınız":
+    (e7>i7?`Emir önde! İrem'in ${e7-i7} tekrar farkı var`:`İrem önde! Emir'in ${i7-e7} tekrar farkı var`);
+  document.getElementById("duelArea").innerHTML=`
+    <div class="duel-row"><span class="dname">Emir</span><div class="duel-track"><div class="duel-fill" style="width:${Math.round(e7/max*100)}%"></div></div><span class="dval">${e7}</span></div>
+    <div class="duel-row"><span class="dname">İrem</span><div class="duel-track"><div class="duel-fill irem" style="width:${Math.round(i7/max*100)}%"></div></div><span class="dval">${i7}</span></div>
+    <div class="duel-msg">${duelMsg}</div>`;
+  // haftalık grafik
+  const days=["Pz","Pt","Sa","Ça","Pe","Cu","Ct"];
+  let bars="",maxV=1;const vals=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(Date.now()-i*DAY);
+    const v=pr.history[d.toISOString().slice(0,10)]||0;
+    vals.push({v,day:days[d.getDay()],isToday:i===0});
+    if(v>maxV)maxV=v;
+  }
+  vals.forEach(x=>{
+    const h=Math.round(x.v/maxV*70)+3;
+    bars+=`<div class="bar-col"><span class="val">${x.v||""}</span><div class="bar ${x.isToday?"today":""}" style="height:${h}px"></div><span class="day">${x.day}</span></div>`;
+  });
+  document.getElementById("weekBars").innerHTML=bars;
+}
+function goToWordStatus(st){
+  statusFilter=st;
+  showScreen("words");
+}
+function saveNewPerDay(){
+  const v=parseInt(document.getElementById("newPerDay").value);
+  prof().newPerDay=isNaN(v)?20:Math.min(200,Math.max(0,v));
+  saveState();
+  toast(prof().newPerDay===0?"Sınırsız mod açık ∞":"Kaydedildi ✓");
+}
+function copyClaudePrompt(){
+  const weak=allWords().filter(w=>{
+    const p=prof().progress[w.id];
+    return p&&((p.lapses||0)>=2||p.ease<2.0)&&!isKnown(p);
+  }).slice(0,15);
+  if(weak.length<3){toast("Henüz yeterli zayıf kelime yok — biraz daha çalış");return;}
+  const list=weak.map(w=>w.en).join(", ");
+  const prompt=`YDS sınavına hazırlanıyorum. Şu kelimeleri öğrenmekte zorlanıyorum: ${list}.\n\nBu kelimelerin HEPSİNİ kullanarak YDS okuma parçası tarzında, akademik tonda, ~120 kelimelik İngilizce bir paragraf yaz. Ardından paragrafın Türkçe çevirisini ver ve her hedef kelimenin paragraftaki kullanımını tek cümleyle açıkla.`;
+  navigator.clipboard.writeText(prompt).then(
+    ()=>toast("Claude'a yapıştırmaya hazır — panoya kopyalandı ✓"),
+    ()=>toast("Kopyalanamadı — tarayıcı izin vermedi")
+  );
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="kelime-defteri-yedek-"+todayStr()+".json";
+  a.click();
+  toast("Yedek indirildi ✓");
+}
+function importData(ev){
+  const file=ev.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(!data.profiles)throw new Error("format");
+      state=normalize(data);saveState();
+      applyTheme();setProfile(state.profile);
+      toast("Yedek geri yüklendi ✓");
+    }catch(e){toast("Dosya okunamadı — geçerli bir yedek değil");}
+  };
+  r.readAsText(file);ev.target.value="";
+}
+function resetProgress(){
+  if(!confirm("Emir ve İrem'in TÜM çalışma ilerlemesi (öğrenilen/öğreniliyor durumları, tekrar geçmişi, seri, istatistikler) silinecek. Kelime listesi, eklediğin kelimeler ve gruplar korunur. Devam edilsin mi?"))return;
+  if(!confirm("Emin misin? Bu işlem geri alınamaz."))return;
+  ["emir","irem"].forEach(p=>{
+    state.profiles[p]={progress:{},history:{},newPerDay:state.profiles[p].newPerDay||20,totalReviews:0,streak:0,lastStudyDay:null};
+  });
+  saveState();
+  session=null;quiz=null;matchGame=null;
+  toast("Tüm ilerleme sıfırlandı ✓");
+  setProfile(state.profile);
+}
+
+/* ================= INIT ================= */
+function refreshAll(){
+  renderStudy();renderWordList();renderProfile();
+  if(document.getElementById("screen-quiz").classList.contains("active"))renderQuizHome();
+}
+applyTheme();
+setProfile(state.profile||"emir");
+</script>
+</body>
+</html>
