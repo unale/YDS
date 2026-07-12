@@ -78,6 +78,15 @@ p.section-sub{color:var(--ink-soft);font-size:.9rem;margin-bottom:14px}
 .study-mode-switch button.active{background:var(--ink);color:var(--paper)}
 .cat-tracker{display:flex;gap:10px;flex-wrap:wrap;font-size:.74rem;font-weight:700;margin-bottom:10px;color:var(--ink-soft)}
 .struggle-banner{background:var(--marker-soft);border:1px solid var(--marker);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-size:.85rem}
+.folder-chart{margin:14px 0}
+.fc-bar{display:flex;height:12px;border-radius:6px;overflow:hidden;background:var(--line)}
+.fc-seg{min-width:3px}
+.fc-known{background:var(--green)}
+.fc-learning{background:var(--marker)}
+.fc-stubborn{background:var(--red)}
+.fc-new{background:var(--line)}
+.fc-legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:.72rem;font-weight:700;color:var(--ink-soft);margin-top:8px}
+.fc-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px}
 .match-progress{text-align:center;font-size:.82rem;font-weight:700;color:var(--ink-soft);margin-bottom:10px}
 .match-grid{display:flex;gap:10px}
 .match-col{flex:1;display:flex;flex-direction:column;gap:8px}
@@ -220,6 +229,8 @@ html[data-theme="dark"] .grade-btn.hard{color:var(--marker)}
 .dup-badge{font-size:.74rem;padding:4px 10px;border-radius:8px;margin:-2px 0 8px 28px;display:inline-block}
 .dup-exact{background:var(--line);color:var(--ink-faint)}
 .dup-conflict{background:var(--marker-soft);color:#9A6A00}
+.dup-locations{margin-top:10px;font-size:.82rem;color:var(--ink-soft);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.remove-btn{margin-top:12px;color:var(--red);border-color:var(--red)}
 .preview-row input[type=checkbox]{width:20px;height:20px;flex-shrink:0}
 .preview-row input[type=text]{flex:1;min-width:0;padding:9px 10px;border-radius:8px;border:1px solid var(--line);background:var(--paper);font-size:.85rem}
 .preview-meta{display:flex;gap:8px;margin:10px 0;align-items:center;font-size:.82rem}
@@ -291,13 +302,6 @@ nav button.active{color:var(--ink);background:var(--paper)}
     </div>
     <div class="study-controls">
       <select class="cat-select" id="studyCat" onchange="onStudyCatChange()" aria-label="Kategori seçimi"></select>
-      <select class="cat-select" id="sessionSize" onchange="session=null;renderStudy()" aria-label="Oturum kelime sayısı">
-        <option value="0">Tüm kelimeler</option>
-        <option value="10">10 kelime</option>
-        <option value="20" selected>20 kelime</option>
-        <option value="30">30 kelime</option>
-        <option value="50">50 kelime</option>
-      </select>
     </div>
     <select class="cat-select" id="studySub" style="display:none" onchange="session=null;matchGame=null;renderStudy()" aria-label="Alt grup seçimi"></select>
     <div class="cat-tracker" id="catTracker"></div>
@@ -386,6 +390,7 @@ nav button.active{color:var(--ink);background:var(--paper)}
     <button class="big-btn secondary" onclick="document.getElementById('importFile').click()">Yedekten geri yükle</button>
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
     <button class="big-btn secondary" style="color:var(--red);border-color:var(--red)" onclick="resetProgress()">⚠️ Tüm ilerlemeyi sıfırla</button>
+    <div id="hiddenWordsList"></div>
     <p class="storage-note">Veriler bu cihazın tarayıcısında saklanır. Cihazlar arası taşımak için yedekle / geri yükle kullanın. Emir ve İrem profillerinin ilerlemesi ayrı tutulur; sınav tarihi ve kelime listesi ortaktır.</p>
   </section>
 </main>
@@ -890,7 +895,183 @@ const WORDS=[
 {id:879,en:"heredity",tr:"kalıtım",pos:"n.",ex:"Heredity plays a major role in determining susceptibility to the disease.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
 {id:880,en:"progression",tr:"ilerleme",pos:"n.",ex:"Regular monitoring helps track the progression of the illness.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
 {id:881,en:"detection",tr:"tespit etme, saptama",pos:"n.",ex:"CRISPR enables unprecedented possibilities for early disease detection.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
-{id:882,en:"contamination",tr:"kirlilik, bulaşma",pos:"n.",ex:"Strict protocols prevent contamination of the samples.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"}
+{id:882,en:"contamination",tr:"kirlilik, bulaşma",pos:"n.",ex:"Strict protocols prevent contamination of the samples.",level:"C1",cat:"ders",sub:"07 Temmuz - Fiil ve İsim"},
+{id:883,en:"put forward",tr:"ileri sürmek, öne sürmek",pos:"phr.v.",ex:"The committee put forward a new proposal to reduce emissions.",exTr:"Komite, emisyonları azaltmak için yeni bir öneri ileri sürdü.",syn:"propose, suggest",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:884,en:"fall apart",tr:"dağılmak, parçalanmak",pos:"phr.v.",ex:"The coalition fell apart after months of disagreement.",exTr:"Koalisyon, aylarca süren anlaşmazlığın ardından dağıldı.",syn:"collapse, disintegrate",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:885,en:"adhere to",tr:"bağlı kalmak, sadık kalmak",pos:"phr.v.",ex:"Patients who do not adhere to the regimen may face complications.",exTr:"Rejime bağlı kalmayan hastalar komplikasyonlarla karşılaşabilir.",syn:"stick to, comply with",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:886,en:"call off",tr:"iptal etmek",pos:"phr.v.",ex:"The match was called off due to heavy rain.",exTr:"Maç, şiddetli yağış nedeniyle iptal edildi.",syn:"cancel",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:887,en:"hand over",tr:"devretmek, teslim etmek",pos:"phr.v.",ex:"The retiring director handed over his duties to his successor.",exTr:"Emekli olan müdür, görevlerini halefine devretti.",syn:"transfer, turn over",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:888,en:"hand down",tr:"nesilden nesile aktarmak, miras bırakmak",pos:"phr.v.",ex:"These traditions have been handed down for generations.",exTr:"Bu gelenekler nesillerdir aktarılagelmiştir.",syn:"pass down",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:889,en:"make out",tr:"anlamak, seçmek, çözmek",pos:"phr.v.",ex:"It was difficult to make out what the speaker meant.",exTr:"Konuşmacının ne demek istediğini anlamak zordu.",syn:"figure out, discern",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:890,en:"divide into",tr:"bölmek, ayırmak",pos:"phr.v.",ex:"The study population was divided into three groups.",exTr:"Çalışma popülasyonu üç gruba bölündü.",syn:"split into",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:891,en:"take away",tr:"alıp götürmek, elinden almak",pos:"phr.v.",ex:"The new law took away several privileges from landowners.",exTr:"Yeni yasa, toprak sahiplerinden birçok ayrıcalığı alıp götürdü.",syn:"remove",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:892,en:"look down on",tr:"küçük görmek, hor görmek",pos:"phr.v.",ex:"He was criticized for looking down on his colleagues.",exTr:"Meslektaşlarını küçük gördüğü için eleştirildi.",syn:"despise, scorn",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:893,en:"get up",tr:"kalkmak",pos:"phr.v.",ex:"She gets up early to study before work.",exTr:"İşten önce çalışmak için erken kalkıyor.",syn:"rise",level:"A2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:894,en:"come out",tr:"çıkmak, ortaya çıkmak, yayımlanmak",pos:"phr.v.",ex:"The report came out just before the election.",exTr:"Rapor tam seçimden önce çıktı.",syn:"be published, emerge",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:895,en:"refer to",tr:"anlamına gelmek, kastetmek, atıfta bulunmak",pos:"phr.v.",ex:"In this context, the term refers to long-term memory.",exTr:"Bu bağlamda terim, uzun süreli belleği kasteder.",syn:"denote, mention",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:896,en:"look up",tr:"(sözlükten/kaynaktan) bakmak, aramak",pos:"phr.v.",ex:"Students were told to look up unfamiliar words in a dictionary.",exTr:"Öğrencilere bilmedikleri kelimeleri sözlükten bakmaları söylendi.",syn:"search for",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:897,en:"bring back",tr:"geri getirmek; hatırlatmak",pos:"phr.v.",ex:"The exhibition brought back memories of his childhood.",exTr:"Sergi, çocukluğuna dair anıları geri getirdi.",syn:"restore, recall",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:898,en:"throw away",tr:"atmak, çöpe atmak",pos:"phr.v.",ex:"Do not throw away documents that may be needed later.",exTr:"Daha sonra gerekebilecek belgeleri atmayın.",syn:"discard",level:"B1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:899,en:"give in",tr:"teslim olmak, boyun eğmek",pos:"phr.v.",ex:"The government refused to give in to the protesters' demands.",exTr:"Hükümet, protestocuların taleplerine boyun eğmeyi reddetti.",syn:"surrender, yield",level:"B2",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:900,en:"call for",tr:"gerektirmek; çağrıda bulunmak",pos:"phr.v.",ex:"The crisis calls for immediate international action.",exTr:"Kriz, acil uluslararası eylem gerektiriyor.",syn:"require, demand",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:901,en:"integrate into",tr:"dahil etmek, entegre etmek",pos:"phr.v.",ex:"Try to integrate new vocabulary into your daily practice.",exTr:"Yeni kelimeleri günlük pratiğine dahil etmeye çalış.",syn:"incorporate into",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:902,en:"characterized by",tr:"ile özdeşleşmiş, ile karakterize",pos:"phr.",ex:"The period was characterized by rapid industrial growth.",exTr:"Dönem, hızlı sanayi büyümesiyle özdeşleşmişti.",syn:"marked by",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:903,en:"insight into",tr:"hakkında kavrayış, iç görü",pos:"phr.",ex:"The study provides valuable insight into consumer behavior.",exTr:"Çalışma, tüketici davranışına dair değerli bir kavrayış sunuyor.",syn:"understanding of",level:"C1",cat:"ders",sub:"08 Temmuz - Deyimsel Fiiller ve Preposition"},
+{id:904,en:"persistent",tr:"ısrarcı; kalıcı, sürekli",pos:"adj.",ex:"A persistent cough may indicate an underlying condition.",exTr:"İnatçı bir öksürük, altta yatan bir hastalığa işaret edebilir.",syn:"continuous, lasting",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:905,en:"vital",tr:"hayati, çok önemli",pos:"adj.",ex:"Clean water is vital for public health.",exTr:"Temiz su, halk sağlığı için hayatidir.",syn:"essential, crucial",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:906,en:"beneficial",tr:"faydalı, yararlı",pos:"adj.",ex:"Regular exercise is beneficial to both body and mind.",exTr:"Düzenli egzersiz hem bedene hem zihne faydalıdır.",syn:"advantageous",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:907,en:"intentional",tr:"kasıtlı",pos:"adj.",ex:"The court ruled that the damage was intentional.",exTr:"Mahkeme, hasarın kasıtlı olduğuna hükmetti.",syn:"deliberate",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:908,en:"invaluable",tr:"paha biçilmez, çok değerli",pos:"adj.",ex:"Her experience proved invaluable to the research team.",exTr:"Deneyimi, araştırma ekibi için paha biçilmez oldu.",syn:"priceless",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:909,en:"upheaval",tr:"büyük karışıklık, alt üst oluş",pos:"n.",ex:"The war caused enormous social upheaval across the region.",exTr:"Savaş, bölge genelinde muazzam bir toplumsal karışıklığa yol açtı.",syn:"turmoil, disruption",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:910,en:"plausible",tr:"akla yatkın, makul",pos:"adj.",ex:"The researchers offered a plausible explanation for the anomaly.",exTr:"Araştırmacılar anomali için akla yatkın bir açıklama sundu.",syn:"credible, reasonable",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:911,en:"measurable",tr:"ölçülebilir",pos:"adj.",ex:"The program produced measurable improvements in test scores.",exTr:"Program, test puanlarında ölçülebilir iyileşmeler sağladı.",syn:"quantifiable",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:912,en:"refutable",tr:"çürütülebilir, yalanlanabilir",pos:"adj.",ex:"A scientific claim must be refutable to be testable.",exTr:"Bilimsel bir iddianın test edilebilir olması için çürütülebilir olması gerekir.",syn:"disprovable",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:913,en:"elaborate",tr:"özenli, ayrıntılı",pos:"adj.",ex:"The palace is famous for its elaborate decorations.",exTr:"Saray, özenli süslemeleriyle ünlüdür.",syn:"detailed, intricate",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:914,en:"unprecedented",tr:"eşi görülmemiş, emsalsiz",pos:"adj.",ex:"The pandemic caused unprecedented disruption to global travel.",exTr:"Pandemi, küresel seyahatte eşi görülmemiş bir aksamaya yol açtı.",syn:"unparalleled",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:915,en:"indicative",tr:"gösteren, işaret eden (of)",pos:"adj.",ex:"High fever is often indicative of infection.",exTr:"Yüksek ateş genellikle enfeksiyona işaret eder.",syn:"suggestive",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:916,en:"arrogant",tr:"küstah, kibirli",pos:"adj.",ex:"His arrogant attitude alienated his coworkers.",exTr:"Küstah tavrı, iş arkadaşlarını kendisinden uzaklaştırdı.",syn:"haughty",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:917,en:"rigorous",tr:"titiz, sıkı (yöntem)",pos:"adj.",ex:"The drug underwent rigorous testing before approval.",exTr:"İlaç, onaydan önce titiz testlerden geçti.",syn:"strict, thorough",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:918,en:"notorious",tr:"adı çıkmış, kötü şöhretli",pos:"adj.",ex:"The area is notorious for its heavy traffic.",exTr:"Bölge, yoğun trafiğiyle kötü ünlüdür.",syn:"infamous",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:919,en:"cautious",tr:"ihtiyatlı, tedbirli",pos:"adj.",ex:"Investors remained cautious amid economic uncertainty.",exTr:"Yatırımcılar, ekonomik belirsizlik ortamında ihtiyatlı kaldı.",syn:"careful, wary",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:920,en:"deficient",tr:"yetersiz, eksik",pos:"adj.",ex:"A diet deficient in iron can lead to anemia.",exTr:"Demir açısından yetersiz bir diyet anemiye yol açabilir.",syn:"lacking, inadequate",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:921,en:"identical",tr:"aynı, özdeş",pos:"adj.",ex:"The twins wore identical outfits to the party.",exTr:"İkizler partiye birbirinin aynısı kıyafetler giydi.",syn:"the same",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:922,en:"urgent",tr:"acil",pos:"adj.",ex:"The patient required urgent medical attention.",exTr:"Hasta acil tıbbi müdahale gerektiriyordu.",syn:"pressing",level:"B1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:923,en:"relative",tr:"göreceli, nispi",pos:"adj.",ex:"The relative importance of each factor varies by context.",exTr:"Her faktörün göreceli önemi bağlama göre değişir.",syn:"comparative",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:924,en:"temporary",tr:"geçici",pos:"adj.",ex:"The closure is temporary and will end next month.",exTr:"Kapanış geçicidir ve gelecek ay sona erecek.",syn:"provisional",level:"B1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:925,en:"definite",tr:"kesin, belirli",pos:"adj.",ex:"There is no definite answer to this question yet.",exTr:"Bu soruya henüz kesin bir yanıt yok.",syn:"certain, clear",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:926,en:"distinct",tr:"farklı, belirgin",pos:"adj.",ex:"The two species are genetically distinct from each other.",exTr:"İki tür genetik olarak birbirinden farklıdır.",syn:"separate, clear-cut",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:927,en:"valid",tr:"geçerli",pos:"adj.",ex:"Your ticket is valid for thirty days.",exTr:"Biletiniz otuz gün geçerlidir.",syn:"legitimate",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:928,en:"irreversible",tr:"geri döndürülemez",pos:"adj.",ex:"Deforestation may cause irreversible damage to ecosystems.",exTr:"Ormansızlaşma, ekosistemlerde geri döndürülemez hasara yol açabilir.",syn:"permanent",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:929,en:"durable",tr:"dayanıklı",pos:"adj.",ex:"The tools are made of durable stainless steel.",exTr:"Aletler dayanıklı paslanmaz çelikten yapılmıştır.",syn:"long-lasting, sturdy",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:930,en:"undesirable",tr:"istenmeyen",pos:"adj.",ex:"The medication may produce undesirable side effects.",exTr:"İlaç istenmeyen yan etkiler üretebilir.",syn:"unwanted",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:931,en:"applicable",tr:"uygulanabilir, geçerli",pos:"adj.",ex:"The rule is applicable to all employees without exception.",exTr:"Kural, istisnasız tüm çalışanlara uygulanabilir.",syn:"relevant, valid",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:932,en:"notable",tr:"dikkate değer, önemli",pos:"adj.",ex:"The conference attracted several notable scientists.",exTr:"Konferans, birçok önemli bilim insanını cezbetti.",syn:"remarkable",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:933,en:"eager",tr:"istekli, hevesli",pos:"adj.",ex:"The students were eager to learn about the experiment.",exTr:"Öğrenciler deneyi öğrenmeye hevesliydi.",syn:"keen, enthusiastic",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:934,en:"astonished",tr:"şaşırmış, hayrete düşmüş",pos:"adj.",ex:"Scientists were astonished by the speed of the discovery.",exTr:"Bilim insanları keşfin hızına hayret etti.",syn:"amazed",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:935,en:"hesitant",tr:"tereddütlü, çekingen",pos:"adj.",ex:"She was hesitant to share her results before verification.",exTr:"Doğrulamadan önce sonuçlarını paylaşmakta tereddütlüydü.",syn:"reluctant",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:936,en:"tentatively",tr:"geçici olarak; çekinerek",pos:"adv.",ex:"The meeting has been tentatively scheduled for Friday.",exTr:"Toplantı geçici olarak cumaya planlandı.",syn:"provisionally",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:937,en:"strikingly",tr:"çarpıcı biçimde",pos:"adv.",ex:"The two paintings are strikingly similar.",exTr:"İki tablo çarpıcı biçimde benzerdir.",syn:"remarkably",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:938,en:"promptly",tr:"derhal, hemen",pos:"adv.",ex:"The staff responded promptly to the emergency call.",exTr:"Personel acil çağrıya derhal yanıt verdi.",syn:"immediately",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:939,en:"ultimately",tr:"nihayetinde, en sonunda",pos:"adv.",ex:"Ultimately, the decision rests with the board.",exTr:"Nihayetinde karar yönetim kuruluna aittir.",syn:"eventually, in the end",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:940,en:"precisely",tr:"tam olarak, kesin biçimde",pos:"adv.",ex:"The instrument measures temperature precisely.",exTr:"Cihaz, sıcaklığı tam olarak ölçer.",syn:"exactly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:941,en:"presently",tr:"şu anda; birazdan",pos:"adv.",ex:"The system is presently under maintenance.",exTr:"Sistem şu anda bakımdadır.",syn:"currently",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:942,en:"accurately",tr:"doğru biçimde, isabetle",pos:"adv.",ex:"The model accurately predicts seasonal rainfall.",exTr:"Model, mevsimsel yağışı doğru biçimde tahmin eder.",syn:"correctly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:943,en:"gradually",tr:"aşamalı olarak, yavaş yavaş",pos:"adv.",ex:"The climate has gradually warmed over the past century.",exTr:"İklim, geçtiğimiz yüzyılda yavaş yavaş ısındı.",syn:"progressively",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:944,en:"adversely",tr:"olumsuz biçimde",pos:"adv.",ex:"Air pollution adversely affects respiratory health.",exTr:"Hava kirliliği solunum sağlığını olumsuz etkiler.",syn:"negatively",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:945,en:"distantly",tr:"uzaktan; uzak biçimde",pos:"adv.",ex:"The two languages are only distantly related.",exTr:"İki dil yalnızca uzaktan akrabadır.",syn:"remotely",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:946,en:"tirelessly",tr:"yorulmadan",pos:"adv.",ex:"Volunteers worked tirelessly to distribute supplies.",exTr:"Gönüllüler, malzemeleri dağıtmak için yorulmadan çalıştı.",syn:"relentlessly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:947,en:"externally",tr:"dışarıdan, haricen",pos:"adv.",ex:"The cream should be applied externally only.",exTr:"Krem yalnızca haricen uygulanmalıdır.",syn:"outwardly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:948,en:"readily",tr:"kolayca; gönüllüce",pos:"adv.",ex:"The information is readily available online.",exTr:"Bilgiye internetten kolayca ulaşılabilir.",syn:"easily, willingly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:949,en:"abruptly",tr:"aniden, birdenbire",pos:"adv.",ex:"The negotiations ended abruptly without agreement.",exTr:"Müzakereler anlaşma olmadan aniden sona erdi.",syn:"suddenly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:950,en:"barely",tr:"zar zor, neredeyse hiç",pos:"adv.",ex:"The refugees had barely enough food to survive.",exTr:"Mülteciler hayatta kalmaya zar zor yetecek yiyeceğe sahipti.",syn:"hardly, scarcely",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:951,en:"mutually",tr:"karşılıklı olarak",pos:"adv.",ex:"The two dialects are mutually intelligible.",exTr:"İki lehçe karşılıklı olarak anlaşılabilirdir.",syn:"reciprocally",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:952,en:"bilateral",tr:"iki taraflı, ikili",pos:"adj.",ex:"The countries signed a bilateral trade agreement.",exTr:"Ülkeler ikili bir ticaret anlaşması imzaladı.",syn:"two-sided",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:953,en:"reluctantly",tr:"gönülsüzce, istemeyerek",pos:"adv.",ex:"He reluctantly agreed to postpone the launch.",exTr:"Lansmanı ertelemeyi gönülsüzce kabul etti.",syn:"unwillingly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:954,en:"casually",tr:"gelişigüzel; rahat biçimde",pos:"adv.",ex:"She mentioned the discovery casually during lunch.",exTr:"Keşiften öğle yemeğinde laf arasında bahsetti.",syn:"informally",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:955,en:"meticulously",tr:"titizlikle",pos:"adv.",ex:"Each specimen was meticulously labeled and stored.",exTr:"Her örnek titizlikle etiketlenip saklandı.",syn:"carefully, thoroughly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:956,en:"conversely",tr:"aksine, tersine",pos:"adv.",ex:"Conversely, higher prices may reduce demand.",exTr:"Aksine, daha yüksek fiyatlar talebi azaltabilir.",syn:"on the contrary",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:957,en:"densely",tr:"yoğun biçimde",pos:"adv.",ex:"The region is densely populated and heavily industrialized.",exTr:"Bölge yoğun nüfusludur ve ağır biçimde sanayileşmiştir.",syn:"thickly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:958,en:"fairly",tr:"oldukça; adil biçimde",pos:"adv.",ex:"The test results were fairly consistent across groups.",exTr:"Test sonuçları gruplar arasında oldukça tutarlıydı.",syn:"quite; justly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:959,en:"formerly",tr:"eskiden, önceden",pos:"adv.",ex:"The building was formerly used as a hospital.",exTr:"Bina eskiden hastane olarak kullanılıyordu.",syn:"previously",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:960,en:"confidentially",tr:"gizlice, gizlilikle",pos:"adv.",ex:"The data were shared confidentially with the auditors.",exTr:"Veriler denetçilerle gizlilik içinde paylaşıldı.",syn:"privately",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:961,en:"invariably",tr:"değişmez biçimde, her seferinde",pos:"adv.",ex:"Such policies invariably provoke public debate.",exTr:"Bu tür politikalar her seferinde kamuoyu tartışması doğurur.",syn:"always, without exception",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:962,en:"instantly",tr:"anında",pos:"adv.",ex:"The message was delivered instantly to all users.",exTr:"Mesaj tüm kullanıcılara anında iletildi.",syn:"immediately",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:963,en:"preferably",tr:"tercihen",pos:"adv.",ex:"Submit the form early, preferably before noon.",exTr:"Formu erken, tercihen öğleden önce gönderin.",syn:"ideally",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:964,en:"approximately",tr:"yaklaşık olarak",pos:"adv.",ex:"The journey takes approximately three hours.",exTr:"Yolculuk yaklaşık üç saat sürer.",syn:"roughly, about",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:965,en:"indifferently",tr:"umursamazca, kayıtsızca",pos:"adv.",ex:"He shrugged indifferently at the criticism.",exTr:"Eleştiriye umursamazca omuz silkti.",syn:"unconcernedly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:966,en:"potentially",tr:"potansiyel olarak",pos:"adv.",ex:"The virus is potentially dangerous to elderly patients.",exTr:"Virüs, yaşlı hastalar için potansiyel olarak tehlikelidir.",syn:"possibly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:967,en:"recklessly",tr:"pervasızca, dikkatsizce",pos:"adv.",ex:"Driving recklessly endangers everyone on the road.",exTr:"Pervasızca araba kullanmak yoldaki herkesi tehlikeye atar.",syn:"carelessly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:968,en:"doubtfully",tr:"şüpheyle, kuşkuyla",pos:"adv.",ex:"She looked doubtfully at the unverified figures.",exTr:"Doğrulanmamış rakamlara şüpheyle baktı.",syn:"skeptically",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:969,en:"scarcely",tr:"neredeyse hiç, güçbela",pos:"adv.",ex:"There was scarcely any evidence to support the claim.",exTr:"İddiayı destekleyecek neredeyse hiç kanıt yoktu.",syn:"hardly, barely",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:970,en:"substantially",tr:"önemli ölçüde",pos:"adv.",ex:"Production costs have fallen substantially since 2020.",exTr:"Üretim maliyetleri 2020'den bu yana önemli ölçüde düştü.",syn:"considerably",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:971,en:"extravagantly",tr:"müsrifçe, savurganca",pos:"adv.",ex:"The palace was extravagantly decorated with gold.",exTr:"Saray, altınla savurganca süslenmişti.",syn:"lavishly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:972,en:"willingly",tr:"isteyerek, gönüllü olarak",pos:"adv.",ex:"The witnesses willingly cooperated with the investigation.",exTr:"Tanıklar soruşturmaya isteyerek işbirliği yaptı.",syn:"voluntarily",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:973,en:"briefly",tr:"kısaca",pos:"adv.",ex:"The minister briefly addressed the reporters.",exTr:"Bakan, muhabirlere kısaca hitap etti.",syn:"concisely",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:974,en:"excessively",tr:"aşırı derecede",pos:"adv.",ex:"Consuming sugar excessively increases health risks.",exTr:"Aşırı şeker tüketimi sağlık risklerini artırır.",syn:"overly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:975,en:"broadly",tr:"genel olarak, geniş biçimde",pos:"adv.",ex:"The findings are broadly consistent with earlier studies.",exTr:"Bulgular, önceki çalışmalarla genel olarak tutarlıdır.",syn:"generally",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:976,en:"implicitly",tr:"dolaylı olarak, üstü kapalı biçimde",pos:"adv.",ex:"The contract implicitly assumes annual renewal.",exTr:"Sözleşme, yıllık yenilemeyi üstü kapalı biçimde varsayar.",syn:"tacitly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:977,en:"severely",tr:"şiddetli biçimde, ağır biçimde",pos:"adv.",ex:"The region was severely affected by the drought.",exTr:"Bölge kuraklıktan ağır biçimde etkilendi.",syn:"seriously, harshly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:978,en:"genuinely",tr:"içtenlikle, gerçekten",pos:"adv.",ex:"She seemed genuinely interested in the project.",exTr:"Projeyle gerçekten ilgileniyor gibiydi.",syn:"sincerely, truly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:979,en:"incidentally",tr:"bu arada; tesadüfen",pos:"adv.",ex:"Incidentally, the same method was used in an earlier trial.",exTr:"Bu arada, aynı yöntem daha önceki bir denemede de kullanılmıştı.",syn:"by the way",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:980,en:"vaguely",tr:"belirsiz biçimde, üstünkörü",pos:"adv.",ex:"He only vaguely remembered the details of the meeting.",exTr:"Toplantının ayrıntılarını yalnızca hayal meyal hatırlıyordu.",syn:"unclearly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:981,en:"irrationally",tr:"mantıksızca, akıl dışı biçimde",pos:"adv.",ex:"Markets sometimes behave irrationally under stress.",exTr:"Piyasalar stres altında bazen mantıksızca davranır.",syn:"unreasonably",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:982,en:"suspiciously",tr:"şüpheli biçimde; kuşkuyla",pos:"adv.",ex:"The results looked suspiciously good to the reviewers.",exTr:"Sonuçlar hakemlere şüphe uyandıracak kadar iyi göründü.",syn:"distrustfully",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:983,en:"increasingly",tr:"giderek artan biçimde",pos:"adv.",ex:"Companies are increasingly relying on automation.",exTr:"Şirketler otomasyona giderek daha fazla güveniyor.",syn:"more and more",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:984,en:"plainly",tr:"açıkça",pos:"adv.",ex:"The instructions were plainly written for all users.",exTr:"Talimatlar tüm kullanıcılar için açıkça yazılmıştı.",syn:"clearly",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:985,en:"voluntarily",tr:"gönüllü olarak",pos:"adv.",ex:"Hundreds of citizens voluntarily joined the cleanup effort.",exTr:"Yüzlerce vatandaş temizlik çalışmasına gönüllü olarak katıldı.",syn:"willingly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:986,en:"solely",tr:"yalnızca, sadece",pos:"adv.",ex:"Admission is based solely on academic merit.",exTr:"Kabul, yalnızca akademik başarıya dayanır.",syn:"only, exclusively",level:"C1",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:987,en:"anxiously",tr:"kaygıyla, endişeyle",pos:"adv.",ex:"Families waited anxiously for news of the survivors.",exTr:"Aileler, hayatta kalanlardan haber almak için endişeyle bekledi.",syn:"worriedly",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:988,en:"relatively",tr:"nispeten, görece",pos:"adv.",ex:"The procedure is relatively safe when performed early.",exTr:"İşlem, erken yapıldığında nispeten güvenlidir.",syn:"comparatively",level:"B2",cat:"ders",sub:"Kelime Bilgisi ve Zarflar"},
+{id:989,en:"fall into",tr:"(kategorilere) ayrılmak; düşmek",pos:"phr.v.",ex:"Phrasal verbs fall into two main categories.",exTr:"Deyimsel fiiller iki ana kategoriye ayrılır.",syn:"be divided into",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:990,en:"fall behind",tr:"geri kalmak",pos:"phr.v.",ex:"Students who miss classes quickly fall behind.",exTr:"Derslere gelmeyen öğrenciler hızla geri kalır.",syn:"lag behind",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:991,en:"break into",tr:"(hırsızlık için) zorla girmek",pos:"phr.v.",ex:"Thieves broke into the warehouse overnight.",exTr:"Hırsızlar gece boyunca depoya zorla girdi.",syn:"burgle",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:992,en:"take in",tr:"anlamak, kavramak; içeri almak",pos:"phr.v.",ex:"There was too much information to take in at once.",exTr:"Bir seferde kavranamayacak kadar çok bilgi vardı.",syn:"absorb, comprehend",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:993,en:"run into",tr:"rastlamak, karşılaşmak",pos:"phr.v.",ex:"I ran into an old classmate at the conference.",exTr:"Konferansta eski bir sınıf arkadaşıma rastladım.",syn:"come across, encounter",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:994,en:"split up",tr:"parçalamak; ayrılmak",pos:"phr.v.",ex:"The company was split up into three divisions.",exTr:"Şirket üç bölüme ayrıldı.",syn:"break up, divide",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:995,en:"put aside",tr:"kenara koymak, bir yana bırakmak",pos:"phr.v.",ex:"They put aside their differences to finish the project.",exTr:"Projeyi bitirmek için farklılıklarını bir kenara bıraktılar.",syn:"set aside",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:996,en:"put out",tr:"söndürmek",pos:"phr.v.",ex:"Firefighters put out the blaze within an hour.",exTr:"İtfaiyeciler yangını bir saat içinde söndürdü.",syn:"extinguish",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:997,en:"show off",tr:"hava atmak, gösteriş yapmak",pos:"phr.v.",ex:"He bought the car mainly to show off.",exTr:"Arabayı esasen hava atmak için aldı.",syn:"boast",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:998,en:"turn over",tr:"devretmek, teslim etmek; ters çevirmek",pos:"phr.v.",ex:"The suspect was turned over to the authorities.",exTr:"Şüpheli, yetkililere teslim edildi.",syn:"hand over",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:999,en:"look for",tr:"aramak",pos:"phr.v.",ex:"Researchers are looking for volunteers for the trial.",exTr:"Araştırmacılar deneme için gönüllü arıyor.",syn:"search for, seek",level:"B1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1000,en:"keep on",tr:"devam etmek",pos:"phr.v.",ex:"She kept on working despite the interruptions.",exTr:"Kesintilere rağmen çalışmaya devam etti.",syn:"continue",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1001,en:"live up to",tr:"beklentiye cevap vermek, layık olmak",pos:"phr.v.",ex:"The sequel failed to live up to expectations.",exTr:"Devam filmi beklentilere cevap veremedi.",syn:"meet, fulfil",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1002,en:"fall back on",tr:"son çare olarak başvurmak, güvenmek",pos:"phr.v.",ex:"With no savings, they had nothing to fall back on.",exTr:"Birikimleri olmadığı için başvuracak hiçbir şeyleri yoktu.",syn:"resort to",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1003,en:"run over",tr:"(araçla) ezmek",pos:"phr.v.",ex:"The cyclist was nearly run over at the junction.",exTr:"Bisikletli, kavşakta az kalsın eziliyordu.",syn:"knock down",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1004,en:"wipe out",tr:"yok etmek, silip süpürmek",pos:"phr.v.",ex:"The epidemic wiped out entire villages.",exTr:"Salgın, koca köyleri yok etti.",syn:"eradicate, destroy",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1005,en:"give off",tr:"salmak, yaymak (koku, gaz, ısı)",pos:"phr.v.",ex:"The plant gives off a strong scent at night.",exTr:"Bitki geceleri güçlü bir koku yayar.",syn:"emit, release",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1006,en:"wear down",tr:"aşındırmak; yıpratmak",pos:"phr.v.",ex:"Constant friction wears down the machine parts.",exTr:"Sürekli sürtünme makine parçalarını aşındırır.",syn:"erode, exhaust",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1007,en:"give rise to",tr:"yol açmak, sebep olmak",pos:"phr.v.",ex:"Poor sanitation gives rise to numerous diseases.",exTr:"Kötü hijyen koşulları birçok hastalığa yol açar.",syn:"cause, lead to",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1008,en:"catch up with",tr:"yetişmek, ayak uydurmak",pos:"phr.v.",ex:"She studied all weekend to catch up with the class.",exTr:"Sınıfa yetişmek için tüm hafta sonu çalıştı.",syn:"keep pace with",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1009,en:"turn into",tr:"dönüşmek, dönüştürmek",pos:"phr.v.",ex:"The small workshop turned into a global company.",exTr:"Küçük atölye, küresel bir şirkete dönüştü.",syn:"transform into",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1010,en:"break up",tr:"ayrılmak; parçalamak, dağıtmak",pos:"phr.v.",ex:"Police broke up the crowd peacefully.",exTr:"Polis kalabalığı barışçıl biçimde dağıttı.",syn:"disperse, split up",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1011,en:"keep out",tr:"dışarıda tutmak, uzak tutmak",pos:"phr.v.",ex:"The fence keeps out wild animals.",exTr:"Çit, vahşi hayvanları dışarıda tutar.",syn:"exclude",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1012,en:"stand out",tr:"göze çarpmak, öne çıkmak",pos:"phr.v.",ex:"Her thesis stands out for its originality.",exTr:"Tezi, özgünlüğüyle öne çıkıyor.",syn:"be prominent",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1013,en:"take part in",tr:"katılmak",pos:"phr.v.",ex:"Over fifty nations took part in the summit.",exTr:"Zirveye elliden fazla ülke katıldı.",syn:"participate in",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1014,en:"watch out for",tr:"dikkat etmek, gözünü açmak",pos:"phr.v.",ex:"Watch out for icy patches on the road.",exTr:"Yoldaki buzlanmalara dikkat edin.",syn:"be careful of",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1015,en:"cut off",tr:"kesmek; izole etmek",pos:"phr.v.",ex:"The village was cut off by the flood for days.",exTr:"Köy, sel nedeniyle günlerce dış dünyadan koptu.",syn:"isolate, disconnect",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1016,en:"pass down",tr:"nesilden nesile aktarmak",pos:"phr.v.",ex:"The recipe has been passed down through generations.",exTr:"Tarif nesiller boyunca aktarılagelmiştir.",syn:"hand down",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1017,en:"blow up",tr:"patlamak; şişirmek; abartmak",pos:"phr.v.",ex:"The bridge was blown up during the war.",exTr:"Köprü, savaş sırasında havaya uçuruldu.",syn:"explode, inflate",level:"B2",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1018,en:"bring out",tr:"ortaya çıkarmak; piyasaya sürmek",pos:"phr.v.",ex:"Crises often bring out people's true character.",exTr:"Krizler çoğu zaman insanların gerçek karakterini ortaya çıkarır.",syn:"reveal, release",level:"C1",cat:"ders",sub:"Phrasal Verbs ve Preposition"},
+{id:1019,en:"past perfect (had done) ne zaman ATILIR?",tr:"Soru kökünde simple past ana fiil veya 'by + past zaman ifadesi' YOKSA past perfect yapılmaz — şıktan at. Ayrıca past perfect bir şıkta kendisiyle (çift) kullanılmaz.",pos:"kural",ex:"By the time the ambulance arrived, the patient had lost consciousness.",exTr:"Ambulans vardığında hasta bilincini çoktan kaybetmişti (arrived: simple past ana fiil → had lost meşru).",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1020,en:"future perfect (will have done) ne zaman ATILIR?",tr:"Soru kökünde 'by + future zaman ifadesi' yoksa future perfect yapılmaz — at.",pos:"kural",ex:"By the year 2090, the global economy will have reached 200 trillion dollars.",exTr:"'By 2090' var → will have reached meşru; by yoksa bu şık elenir.",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1021,en:"would do / would have done ne zaman ATILIR?",tr:"Soru if sorusu değilse (kökte if yoksa) would do ve would have done yapılmaz — at. İstisna: will'in pastı olan would (bkz. Verbal klasörü).",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1022,en:"was/were doing (simple past continuous)",tr:"YDS'de gördüğün yerde doğrudan elenir — bu yapıyı hiç yapma, şıktan sil.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1023,en:"past tense ne zaman ATILIR?",tr:"Soru kökünde past gösteren bir ifade (dün, on yıl önce, 1965'te...) yoksa past bir tense yapma.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1024,en:"kökte hiçbir zaman işareti yoksa?",tr:"'En present' şıkkı ara → puanlama sistemini kullan. Bilimsel gerçekler de present ister.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1025,en:"puanlama: 2 puanlı yapılar",tr:"Simple present ve TÜM present modal'lar (can, may, must, might, could...) 2 puandır.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1026,en:"puanlama: 1 puanlı yapılar",tr:"Simple present continuous, present perfect, present perfect continuous ve simple future (will) 1 puandır.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1027,en:"puanlama: 0 puanlı yapılar",tr:"Tüm past tense'ler, tüm past modal'lar, modal + have done yapıları, would have done ve future perfect 0 puandır.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1028,en:"puanlama nasıl uygulanır?",tr:"Şıktaki iki fiilin puanı toplanır; en yüksek toplam 'en present' şıktır. Puanlar eşitse artık çeviri devreye girer. Puanlama her soruya sürülmez — yalnızca kökte hiçbir zaman işareti yokken.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1029,en:"since + isim/tarih",tr:"'-den beri' demektir → cümlede bir present perfect gerektirir (simple past DEĞİL — klasik tuzak).",pos:"kural",ex:"Since 1965, the discovery has been regarded as a major breakthrough.",exTr:"1965'ten beri → has been regarded (present perfect).",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1030,en:"since + cümle = çünkü",tr:"since'ten sonra tam cümle gelirse 'çünkü' anlamında olabilir — o zaman tense kuralı çalışmaz, çeviriye dön.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1031,en:"FIDO yapısı: for/in/during/over + the last/past + N years",tr:"'Son N yılda' demektir → present perfect işaretidir. Hangi preposition olursa olsun kural aynı.",pos:"kural",ex:"Over the last century, the composition of the atmosphere has changed significantly.",exTr:"Son yüzyılda → has changed (present perfect).",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1032,en:"past perfect + simple past aynı şıkta",tr:"İkisi birlikteyse o şıkkı ATAMAZSIN: simple past ana fiil şıkkın kendisinden gelir, kural kendi kendini karşılar.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1033,en:"without / but for (if'siz unreal)",tr:"'...olmasaydı' anlamı üretir → if görünmese de unreal yapıdır; would / would have meşrulaşır.",pos:"kural",ex:"Without social media, the unrest would not have attracted global attention.",exTr:"Sosyal medya olmasaydı... dikkat çekmezdi (unreal past).",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1034,en:"genel strateji: kökü yorumlama",tr:"Soru kökünü çevirmeye çalışma; önce kurallarla şıklardaki 'pislikleri' at, kalan şıkları sonra değerlendir. Kökteki and/for/more gibi kelimeleri yorumlayarak soru çözülmez.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense Kuralları ve Puanlama"},
+{id:1035,en:"aktif-pasif soruluyor mu testi",tr:"Şıkların bir bölümünün HEPSİ aktif veya HEPSİ pasifse o bölümde aktif-pasif sorulmuyor demektir; bir kısmı aktif bir kısmı pasifse sorulur. Ayrım tense, modal, verbal ve if sorularının hepsinde yapılır.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1036,en:"aktif-pasif kural 1: özneye göre",tr:"Özne eylemi 'EDER' ise aktif, 'EDİLİR' ise pasif seç.",pos:"kural",ex:"The vaccine was developed in 2015.",exTr:"Aşı geliştirmez, geliştirilir → pasif.",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1037,en:"aktif-pasif kural 2: nesneye göre",tr:"Boşluktaki fiilden sonra nesne varsa aktif, nesne yoksa pasif.",pos:"kural",ex:"Scientists discovered a new species in the region.",exTr:"'a new species' nesnesi var → aktif.",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1038,en:"aktif-pasif kural 3: çaresizlik kuralı",tr:"Özneyle de nesneyle de çözülmüyorsa: boşluktan sonra 'to do' veya bir preposition varsa PASİF, yoksa AKTİF yap.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1039,en:"will have to do ≠ future perfect",tr:"Future perfect 'will have + V3'tür; 'will have to do' ise gelecekte zorunluluktur. Karıştırıp future perfect kuralıyla eleme!",pos:"kural",ex:"The government will have to raise taxes.",exTr:"Vergileri artırmak zorunda kalacak (zorunluluk, future perfect değil).",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1040,en:"geçmişte iki olay kuralı",tr:"Önce olan olay past perfect, sonra olan olay simple past ile anlatılır.",pos:"kural",ex:"When the vaccine was finally found in 2015, the infection had already claimed thousands of lives.",exTr:"Önce ölümler (had claimed), sonra aşı bulundu (was found).",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1041,en:"in 2015 ≠ by 2015",tr:"'in + tarih' past perfect'i meşrulaştırmaz; past perfect için 'by + tarih' gerekir. 'in 1965' görüp past perfect seçme.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1042,en:"possibility / likelihood görürsen",tr:"Olasılık bildiren kelime ihtimal modalı ister → may/might'lı şıkka yönel; kesinlik bildiren yapılardan uzaklaş.",pos:"kural",ex:"There is a possibility that tourism may become the backbone of the economy.",exTr:"possibility → may.",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1043,en:"could — puanlama değeri",tr:"Could hem present hem past modal olabilir ama puanlamada HER ZAMAN present sayılır: 2 puan.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1044,en:"in the future ifadesi",tr:"Future ister; present perfect OLAMAZ — present perfect geçmişi şimdiye getirir, geleceğe uzanmaz.",pos:"kural",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1045,en:"must have done",tr:"Geçmişe dair güçlü tahmin: '...yapmış olmalı'. Geçmiş çıkarım sorularında doğru cevap olabilir; çeviri destekliyorsa seç.",pos:"kural",ex:"Sculptures must have played an important role in Mayan tradition.",exTr:"Heykeller önemli rol oynamış olmalı (güçlü geçmiş tahmini).",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1046,en:"for + zaman dilimi = süreç (stretch)",tr:"'for decades', 'for 42 years' gibi ifadeler süreç bildirir → perfect tense gerektirir.",pos:"kural",ex:"The idea of electricity has been investigated by scientists for decades.",exTr:"On yıllardır → has been investigated (present perfect).",level:"YDS",cat:"ders",sub:"Tense ve Aktif-Pasif Stratejileri"},
+{id:1047,en:"verbal nedir?",tr:"Fiilimsi demektir. İngilizcede iki türü vardır: gerund (V-ing) ve infinitive (to + V).",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1048,en:"gerund (doing) çevirisi",tr:"'Yapmak, yaparak, yapan' diye çevrilir.",pos:"kural",ex:"Reading regularly improves vocabulary.",exTr:"Düzenli okumak kelime dağarcığını geliştirir.",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1049,en:"infinitive (to do) çevirisi",tr:"'Yapmak' veya 'yapmak için' diye çevrilir.",pos:"kural",ex:"She moved abroad to study medicine.",exTr:"Tıp okumak için yurt dışına taşındı.",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1050,en:"verbal tablosu: pasif haller",tr:"Gerund pasifi 'being done', infinitive pasifi 'to be done' şeklindedir.",pos:"kural",ex:"Nobody likes being told what to do.",exTr:"Kimse kendisine ne yapacağının söylenmesinden hoşlanmaz.",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1051,en:"verbal tablosu: zaman farklı haller",tr:"Aktif: having done / to have done; Pasif: having been done / to have been done. Ana fiilden ÖNCE olmuş işi anlatır.",pos:"kural",ex:"Having finished the experiment, the team published the results.",exTr:"Deneyi bitirmiş olarak (önce bitirme, sonra yayın).",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1052,en:"verbal kriter 1: şekil kriteri",tr:"Boşluğa gerund mu infinitive mi geleceğine boşluktan ÖNCEKİ yapı (X durumu) karar verir — bilgi gerektiren kriterdir (hangi fiil neyle kullanılır).",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1053,en:"verbal kriter 2-3: çeviri ve aktif-pasif",tr:"Önce çeviri: 'yapmak/yaparak/yapan' mı, 'yapmak için' mi uyuyor? Sonra fiilimsinin aktif mi pasif mi olması gerektiğini test et.",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1054,en:"verbal kriter 4: zaman farkı",tr:"İlk aşamada zaman farklı olanları (having done, to have done, having been done...) at; ancak eylem ana fiilden önceyse geri al.",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1055,en:"verbal kriter 5: çaresizlik kriteri",tr:"Hiçbir kural çözmüyorsa: boşluktan önce VİRGÜL varsa V-ing (gerund) yap.",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1056,en:"iki taraflı soru stratejisi",tr:"Sorunun bir tarafı fiilimsi, diğer tarafı tense soruyorsa çözmeye TERS (tense) tarafından başla — işine öyle gelir.",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1057,en:"would'un iki türü",tr:"1) Unreal if would'u → kökte if yoksa atılır. 2) Will'in pastı (reported speech): 'said/announced that ... would' → simple past ana fiil + that varsa ATILMAZ.",pos:"kural",ex:"In 2019, the Academy announced that Peter Handke would receive the Nobel Prize.",exTr:"announced (simple past) + that → would = will'in pastı, elenmez.",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"},
+{id:1058,en:"anlık fiiller continuous olmaz",tr:"discover gibi anlık fiiller continuous kullanılmaz ('şu an keşfediyorum' denmez) — böyle şıkları ele.",pos:"kural",level:"YDS",cat:"ders",sub:"Verbal (Fiilimsi) Teknikleri"}
 ];
 
 function getCats(){return{...CATS,...(state.customCats||{})};}
@@ -949,6 +1130,27 @@ function normalize(s){
   s.customWords=(s.customWords||[]).map(w=>({cat:"ozel",...w,custom:true}));
   s.customWords.forEach(w=>{if(!w.cat||w.cat==="genel")w.cat="ozel";});
   ["emir","irem"].forEach(p=>{s.profiles[p]={...d.profiles[p],...(s.profiles[p]||{})};});
+  // Custom kelime ID'si gömülü kelimelerle çakışıyorsa custom'a yeni ID ver, ilerlemeyi taşı (bir defalık)
+  {
+    const builtinIds=new Set(WORDS.map(w=>w.id));
+    let maxId=Math.max(1000,...WORDS.map(w=>w.id),...s.customWords.map(w=>w.id||0));
+    s.customWords.forEach(w=>{
+      if(builtinIds.has(w.id)){
+        const oldId=w.id;maxId+=1;w.id=maxId;
+        ["emir","irem"].forEach(pk=>{
+          const prog=s.profiles[pk].progress||{};
+          if(prog[oldId]){prog[maxId]=prog[oldId];delete prog[oldId];}
+        });
+      }
+    });
+  }
+  // Eski otomatik-inatçı sistemden yeni 🚩 işaret sistemine geçiş (bir defalık)
+  ["emir","irem"].forEach(pk=>{
+    const prog=s.profiles[pk].progress||{};
+    Object.values(prog).forEach(p=>{
+      if(p.flagged===undefined&&(p.lapses||0)>=4)p.flagged=true;
+    });
+  });
   return s;
 }
 function saveState(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){memStore=state;}}
@@ -959,7 +1161,10 @@ const todayStr=()=>new Date().toISOString().slice(0,10);
 const now=()=>Date.now();
 const DAY=86400000;
 const STUBBORN_LAPSES=4;
-function allWords(){return WORDS.concat(state.customWords);}
+function allWords(){
+  const hidden=new Set(state.hiddenWordIds||[]);
+  return WORDS.concat(state.customWords).filter(w=>!hidden.has(w.id));
+}
 function prof(){return state.profiles[state.profile];}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function jsq(s){return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'");}
@@ -1009,8 +1214,17 @@ function isKnown(p){return p.reps>=3&&p.interval>=21;}
 function statusOf(id){
   const p=prof().progress[id];
   if(!p||p.reps===0)return"new";
-  if((p.lapses||0)>=STUBBORN_LAPSES&&!isKnown(p))return"stubborn";
+  if(p.flagged)return"stubborn"; // 🚩 kullanıcı kaldırana kadar işaretli kalır
   return isKnown(p)?"known":"learning";
+}
+function flagWord(id){const p=getProg(id);p.flagged=true;prof().progress[id]=p;saveState();}
+function unflagWord(id){
+  const p=prof().progress[id];
+  if(!p)return;
+  p.flagged=false;p.weakCount=0;
+  saveState();
+  toast("🚩 İşaret kaldırıldı");
+  renderWordList();
 }
 function grade(id,g){
   const p=getProg(id);
@@ -1101,30 +1315,32 @@ function dueCounts(){
   const newAvail=lim===Infinity?newPool:Math.min(lim,newPool);
   return{newAvail,review,done:prof().history[todayStr()]||0};
 }
-function buildSession(){
+function buildSession(mode){
+  // mode: "new" = yeni kelimeler öncelikli, "reviews" = süresi gelen tekrarlar öncelikli
   const f=catFilterFn();const words=allWords().filter(f);
   const dueReviews=words.filter(w=>{const p=prof().progress[w.id];return p&&p.reps>0&&p.due<=now();});
   const lim=newLimit();
   let newWords=words.filter(w=>statusOf(w.id)==="new");
   if(lim!==Infinity)newWords=newWords.slice(0,lim);
-  const sizeEl=document.getElementById("sessionSize");
-  const size=sizeEl?parseInt(sizeEl.value)||0:0;
-  if(size>0){
-    // Oturum sayısı SADECE yeni kelime eklemesini sınırlar; süresi gelmiş tekrarlar asla kesilmez.
-    const newBudget=Math.max(0,size-dueReviews.length);
-    newWords=newWords.slice(0,newBudget);
-  }
-  const queue=dueReviews.concat(newWords);
+  const queue=(mode==="reviews")?dueReviews.concat(newWords):newWords.concat(dueReviews);
   return{queue,index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+}
+function flaggedWordsInScope(){
+  const f=catFilterFn();
+  return allWords().filter(f).filter(w=>statusOf(w.id)==="stubborn");
+}
+function startFlaggedSession(){
+  const words=flaggedWordsInScope();
+  if(!words.length){toast("Bu kapsamda işaretli kelime yok");return;}
+  delete prof().lastSessionSummary;
+  session={queue:[...words],index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+  renderStudy();
 }
 function buildExtraSession(){
   const f=catFilterFn();
   let words=allWords().filter(f).filter(w=>statusOf(w.id)!=="known");
   if(words.length===0)words=allWords().filter(f);
   words=[...words].sort(()=>Math.random()-.5);
-  const sizeEl=document.getElementById("sessionSize");
-  const size=sizeEl?parseInt(sizeEl.value)||0:0;
-  if(size>0)words=words.slice(0,size);
   return{queue:words,index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
 }
 function startExtraSession(){delete prof().lastSessionSummary;session=buildExtraSession();session.revealed=false;renderStudy();}
@@ -1244,11 +1460,44 @@ function renderStudy(){
   const area=document.getElementById("studyArea");
   if(!session||session.index>=session.queue.length){
     const summaryHtml=renderSessionSummary();
+    const b=categoryBreakdown();
+    const flagged=flaggedWordsInScope();
+    const chartHtml=`<div class="folder-chart">
+      <div class="fc-bar">
+        ${b.known?`<div class="fc-seg fc-known" style="flex:${b.known}" title="Öğrenildi"></div>`:""}
+        ${b.learning?`<div class="fc-seg fc-learning" style="flex:${b.learning}"></div>`:""}
+        ${b.stubborn?`<div class="fc-seg fc-stubborn" style="flex:${b.stubborn}"></div>`:""}
+        ${b.new?`<div class="fc-seg fc-new" style="flex:${b.new}"></div>`:""}
+      </div>
+      <div class="fc-legend">
+        <span><i class="fc-known"></i>${b.known} öğrenildi</span>
+        <span><i class="fc-learning"></i>${b.learning} öğreniliyor</span>
+        ${b.stubborn?`<span><i class="fc-stubborn"></i>${b.stubborn} 🚩 işaretli</span>`:""}
+        <span><i class="fc-new"></i>${b.new} yeni</span>
+      </div>
+    </div>`;
     if(c.newAvail+c.review===0){
-      area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">🎉</div><h3>Bu kategoride tamam!</h3><p>Süresi gelen tekrar veya günlük kotan kalmadı. İstersen bu kategoriyi yine de çalışmaya devam edebilirsin — günlük planı bozmaz, sadece ekstra pratik olur.</p><button class="big-btn secondary" onclick="startExtraSession()">Yine de pratik yap</button></div>`;
+      const flaggedBtn=flagged.length?`<button class="big-btn" onclick="startFlaggedSession()">🚩 İşaretli ${flagged.length} kelimeye bak</button>`:"";
+      area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">🎉</div><h3>Tüm kelimeleri tekrar ettin, tebrikler!</h3>
+        ${chartHtml}
+        <p>${flagged.length?"İşaretli kelimelerine bakmak ister misin?":"Bu kapsamda süresi gelen tekrar veya yeni kelime kalmadı."}</p>
+        ${flaggedBtn}
+        <button class="big-btn secondary" onclick="startExtraSession()">Serbest pratik yap</button></div>`;
       return;
     }
-    area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">📖</div><h3>Çalışmaya hazır mısın?</h3><p>${c.newAvail===Infinity?"Sınırsız":c.newAvail} yeni kelime ve ${c.review} tekrar seni bekliyor.</p><button class="big-btn" onclick="startSession()">Başla</button></div>`;
+    // Başlangıç ekranı: tekrarlar varsa öncelik seçimi sun
+    let buttons;
+    if(c.review>0&&c.newAvail>0){
+      buttons=`<p style="margin-bottom:4px">Bu klasörde daha önce çalıştığın ve tekrar zamanı gelen <b>${c.review} kelime</b> var. Nasıl başlamak istersin?</p>
+        <button class="big-btn" onclick="startSession('reviews')">🔁 Önce tekrarlarla başla (${c.review})</button>
+        <button class="big-btn secondary" onclick="startSession('new')">✨ Yeni kelimelerle başla (${c.newAvail===Infinity?"sınırsız":c.newAvail})</button>`;
+    }else if(c.review>0){
+      buttons=`<p>${c.review} tekrar seni bekliyor.</p><button class="big-btn" onclick="startSession('reviews')">Başla</button>`;
+    }else{
+      buttons=`<p>${c.newAvail===Infinity?"Sınırsız":c.newAvail} yeni kelime seni bekliyor.</p><button class="big-btn" onclick="startSession('new')">Başla</button>`;
+    }
+    area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">📖</div><h3>Çalışmaya hazır mısın?</h3>${chartHtml}${buttons}
+      <p style="font-size:.78rem;color:var(--ink-faint);margin-top:10px">Oturum sen bitirene kadar devam eder — istediğin an "Oturumu bitir" diyebilirsin.</p></div>`;
     return;
   }
   renderCard();
@@ -1324,7 +1573,7 @@ function renderMatchGame(){
     </div>
     <button class="big-btn secondary" style="margin-top:14px" onclick="matchGame=null;renderMatchGame();">Vazgeç</button>`;
 }
-function startSession(){delete prof().lastSessionSummary;session=buildSession();session.revealed=false;renderStudy();}
+function startSession(mode){delete prof().lastSessionSummary;session=buildSession(mode||"reviews");session.revealed=false;renderStudy();}
 function sessionLiveStats(){
   const stats={again:0,hard:0,good:0,easy:0};
   if(!session)return stats;
@@ -1336,6 +1585,11 @@ function sessionLiveStats(){
 function cardVariant(w){
   const p=prof().progress[w.id];
   const reps=p?p.reps:0;
+  // 1) Bu oturumda az önce Tekrar/Zor aldıysa → kolay format (reveal)
+  if(session.everStruggled&&session.everStruggled.has(w.id))return"reveal";
+  // 2) Cloze'da daha önce (herhangi bir gün) başarısız olduysa →
+  //    kelime "öğrenildi" seviyesine ulaşana kadar cloze'a bir daha girmez
+  if(p&&(p.clozeFails||0)>=1&&!isKnown(p))return"reveal";
   return(reps>=1&&clozeOk(w))?"cloze":"reveal";
 }
 function cardHeaderHtml(w,st){
@@ -1343,7 +1597,7 @@ function cardHeaderHtml(w,st){
     <span class="pos-tag">${esc(w.pos||"")}</span>`;
 }
 function lapseFlagHtml(p){
-  return(p&&(p.lapses||0)>=STUBBORN_LAPSES)?`<span class="lapse-flag">🔥 inatçı (${p.lapses}×)</span>`:"";
+  return(p&&p.flagged)?`<span class="lapse-flag">🚩 işaretli (${p.weakCount||0}× zorlandın)</span>`:"";
 }
 function cardBackHtml(w){
   const ex=currentExample(w)||{en:"",tr:""};
@@ -1401,6 +1655,7 @@ function renderCard(){
   const st=statusOf(w.id);
   const p=prof().progress[w.id];
   const variant=cardVariant(w);
+  session.currentVariant=variant;
   const pct=session.queue.length?Math.round((session.index/session.queue.length)*100):0;
   const s=sessionLiveStats();
   let html=`<div class="session-progress"><div class="session-progress-fill" style="width:${pct}%"></div></div>
@@ -1448,7 +1703,17 @@ function doGrade(g){
   const w=session.queue[session.index];
   session.touched.add(w.id);
   session.finalGrade[w.id]=g;
-  if(g===1||g===2)session.everStruggled.add(w.id);
+  if(g===1||g===2){
+    session.everStruggled.add(w.id);
+    const p=getProg(w.id);
+    p.weakCount=(p.weakCount||0)+1;
+    if(p.weakCount>=3&&!p.flagged){
+      p.flagged=true;
+      toast(`🚩 "${w.en}" işaretlendi — 3 kez zorlandın`);
+    }
+    if(session.currentVariant==="cloze")p.clozeFails=(p.clozeFails||0)+1;
+    prof().progress[w.id]=p;
+  }
   grade(w.id,g);
   if(g===1)session.queue.push(w);
   else if(g===2)requeueWithinSession(w,5,8);
@@ -1477,7 +1742,7 @@ function renderQuizHome(){
     <select id="qScope">
       <option value="seen">Gördüklerim</option>
       <option value="all">Tüm kelimeler</option>
-      <option value="stubborn">İnatçı kelimelerim 🔥</option>
+      <option value="stubborn">🚩 İşaretli kelimelerim</option>
     </select>
     <label for="qCat">Kategori</label>
     <select id="qCat" onchange="updateQuizSubcatSelect()"></select>
@@ -1740,7 +2005,7 @@ function renderStatusLegend(){
     {key:"new",label:"Yeni",dot:"var(--line)",count:c.new},
     {key:"learning",label:"Öğreniliyor",dot:"var(--marker)",count:c.learning},
     {key:"known",label:"Öğrenildi",dot:"var(--green)",count:c.known},
-    {key:"stubborn",label:"İnatçı",dot:"var(--red)",count:c.stubborn}
+    {key:"stubborn",label:"🚩 İşaretli",dot:"var(--red)",count:c.stubborn}
   ];
   document.getElementById("statusLegend").innerHTML=items.map(it=>
     `<button class="chip ${statusFilter===it.key?"active":""}" onclick="setStatusFilter('${it.key}')">${it.dot?`<i class="legend-dot" style="background:${it.dot}"></i>`:""}${it.label} (${it.count})</button>`
@@ -1767,6 +2032,29 @@ function toggleWordDetail(id){
 }
 function clearWordSearch(){
   document.getElementById("wordSearch").value="";
+  renderWordList();
+}
+function duplicateLocations(w){
+  return allWords().filter(x=>x.id!==w.id&&normText(x.en)===normText(w.en));
+}
+function gotoDuplicateLocation(cat,en){
+  catFilter=cat;
+  document.getElementById("wordSearch").value=en;
+  renderWordList();
+}
+function removeWord(id){
+  const w=allWords().find(x=>x.id===id);
+  if(!w)return;
+  if(!confirm(`"${w.en}" (${w.tr}) kaldırılsın mı? Bu işlem geri alınamaz (hazır destedeki kelimeler için Profil'deki gizlenenler listesinden geri getirilebilir).`))return;
+  if(w.custom){
+    state.customWords=state.customWords.filter(x=>x.id!==id);
+  }else{
+    state.hiddenWordIds=state.hiddenWordIds||[];
+    if(!state.hiddenWordIds.includes(id))state.hiddenWordIds.push(id);
+  }
+  expandedWords.delete(id);
+  saveState();
+  toast(`"${w.en}" kaldırıldı`);
   renderWordList();
 }
 function renderWordList(){
@@ -1802,6 +2090,14 @@ function renderWordList(){
       });
       if(w.syn)parts.push(`<div class="syn-line">≈ <b>${esc(w.syn)}</b></div>`);
       if(exs.length===0&&!w.syn)parts.push(`<div class="empty">Örnek cümle veya eş anlamlı kayıtlı değil.</div>`);
+      const dups=duplicateLocations(w);
+      if(dups.length){
+        const cats=getCats();
+        const chips=dups.map(d=>`<button class="chip" onclick="event.stopPropagation();gotoDuplicateLocation('${d.cat}','${jsq(w.en)}')">${esc(cats[d.cat]||d.cat)} → "${esc(d.tr)}"</button>`).join(" ");
+        parts.push(`<div class="dup-locations">📁 Bu kelime başka klasörlerde de var: ${chips}</div>`);
+      }
+      if(st==="stubborn")parts.push(`<button class="chip" style="margin-top:12px;margin-right:6px" onclick="event.stopPropagation();unflagWord(${w.id})">🚩 İşareti kaldır</button>`);
+      parts.push(`<button class="chip remove-btn" onclick="event.stopPropagation();removeWord(${w.id})">🗑️ Bu kelimeyi kaldır</button>`);
       detail=`<div class="wr-detail">${parts.join("")}</div>`;
     }
     return`<div class="word-item ${expanded?"expanded":""}">
@@ -1818,7 +2114,7 @@ function renderWordList(){
     </div>`;
   }).join("")||`<p style="color:var(--ink-faint);text-align:center;padding:20px">Sonuç bulunamadı.</p>`;
 }
-function nextId(){return Math.max(1000,...allWords().map(w=>w.id))+1;}
+function nextId(){return Math.max(1000,...WORDS.map(w=>w.id),...state.customWords.map(w=>w.id))+1;}
 function normText(s){return(s||"").toLowerCase().trim().replace(/\s+/g," ");}
 function findExistingByEn(en){
   const key=normText(en);
@@ -2044,8 +2340,25 @@ function last7(profKey){
   }
   return sum;
 }
+function renderHiddenWordsList(){
+  const el=document.getElementById("hiddenWordsList");
+  if(!el)return;
+  const hidden=(state.hiddenWordIds||[]).map(id=>WORDS.find(w=>w.id===id)).filter(Boolean);
+  if(!hidden.length){el.innerHTML="";return;}
+  el.innerHTML=`<div class="storage-note" style="margin-top:0;margin-bottom:14px">
+    <b>${hidden.length} kelime gizlendi:</b><br>
+    ${hidden.map(w=>`<button class="chip" style="margin:4px 4px 0 0" onclick="restoreHiddenWord(${w.id})">${esc(w.en)} ↩︎ geri getir</button>`).join("")}
+  </div>`;
+}
+function restoreHiddenWord(id){
+  state.hiddenWordIds=(state.hiddenWordIds||[]).filter(x=>x!==id);
+  saveState();
+  toast("Kelime geri getirildi ✓");
+  renderProfile();
+}
 function renderProfile(){
   const pr=prof();
+  renderHiddenWordsList();
   document.getElementById("profileTitle").textContent=state.profile==="emir"?"Emir'in Profili":"İrem'in Profili";
   let streak=pr.streak;
   const yest=new Date(Date.now()-DAY).toISOString().slice(0,10);
