@@ -87,6 +87,19 @@ p.section-sub{color:var(--ink-soft);font-size:.9rem;margin-bottom:14px}
 .fc-new{background:var(--line)}
 .fc-legend{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;font-size:.72rem;font-weight:700;color:var(--ink-soft);margin-top:8px}
 .fc-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:4px}
+/* --- 5 şıklı boşluk doldurma (Tekrar sonrası pekiştirme) --- */
+.choice-hint{margin-top:10px;font-size:.92rem;color:var(--ink-soft);background:var(--blue-soft);padding:8px 12px;border-radius:8px}
+.choice-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.choice-btn{text-align:left;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;font-size:.95rem;color:var(--ink);font-family:inherit;width:100%}
+.choice-btn:not(:disabled):hover{border-color:var(--blue)}
+.choice-btn .choice-en{font-weight:700}
+.choice-btn .choice-meta{display:block;font-size:.78rem;color:var(--ink-soft);margin-top:3px}
+.choice-btn.correct{border-color:var(--green);background:var(--green-soft)}
+.choice-btn.wrong{border-color:var(--red);background:var(--red-soft)}
+.choice-btn.dim{opacity:.6}
+.choice-done-ex{margin-top:12px;font-size:.9rem;background:var(--green-soft);border-radius:8px;padding:10px 12px}
+.choice-done-ex .tr{color:var(--ink-soft);font-size:.82rem;margin-top:3px}
+.know-link-row{text-align:center;margin-top:10px}
 .match-progress{text-align:center;font-size:.82rem;font-weight:700;color:var(--ink-soft);margin-bottom:10px}
 .match-grid{display:flex;gap:10px}
 .match-col{flex:1;display:flex;flex-direction:column;gap:8px}
@@ -1228,6 +1241,7 @@ function unflagWord(id){
 }
 function grade(id,g){
   const p=getProg(id);
+  const wasKnown=p.reps>0&&isKnown(p);
   if(p.reps===0)p.firstDay=todayStr();
   if(g===1){p.ease=Math.max(1.3,p.ease-0.2);p.interval=0;p.lapses=(p.lapses||0)+1;p.due=now()+10*60000;}
   else{
@@ -1239,6 +1253,25 @@ function grade(id,g){
   }
   p.reps++;
   p.exIdx=(p.exIdx||0)+1;
+  // 🚩 iyileşme merdiveni: işaretli kelime üst üste doğru bilindikçe ilerler
+  if(p.flagged){
+    if(g>=3){
+      p.recovery=(p.recovery||0)+1;
+      if(p.recovery>=5){
+        p.flagged=false;p.weakCount=0;p.recovery=0;
+        const w=allWords().find(x=>x.id===id);
+        toast(`🚩→✓ "${w?w.en:""}" işareti otomatik kalktı — 5 kez üst üste doğru!`);
+      }
+    }else{
+      p.recovery=0;
+    }
+  }
+  // 🎉 öğrenildi eşiği geçildi mi? (3+ tekrar ve 21+ gün aralık)
+  if(!wasKnown&&isKnown(p)){
+    const w=allWords().find(x=>x.id===id);
+    if(p.flagged){p.flagged=false;p.weakCount=0;p.recovery=0;}
+    toast(`🎉 Tebrikler! "${w?w.en:""}" artık öğrenildi ✅`);
+  }
   prof().progress[id]=p;
   const d=todayStr();
   prof().history[d]=(prof().history[d]||0)+1;
@@ -1328,6 +1361,18 @@ function buildSession(mode){
 function flaggedWordsInScope(){
   const f=catFilterFn();
   return allWords().filter(f).filter(w=>statusOf(w.id)==="stubborn");
+}
+function knownWordsInScope(){
+  const f=catFilterFn();
+  return allWords().filter(f).filter(w=>statusOf(w.id)==="known");
+}
+function startKnownSession(){
+  const words=knownWordsInScope();
+  if(!words.length){toast("Bu kapsamda öğrenilmiş kelime yok");return;}
+  delete prof().lastSessionSummary;
+  session={queue:[...words].sort(()=>Math.random()-.5),index:0,revealed:false,touched:new Set(),finalGrade:{},everStruggled:new Set(),typedCorrect:undefined,finished:false};
+  toast("✓ Öğrendiklerini tekrar ediyorsun — cevapların takvimi günceller");
+  renderStudy();
 }
 function startFlaggedSession(){
   const words=flaggedWordsInScope();
@@ -1477,11 +1522,14 @@ function renderStudy(){
       </div>
     </div>`;
     if(c.newAvail+c.review===0){
+      const known=knownWordsInScope();
       const flaggedBtn=flagged.length?`<button class="big-btn" onclick="startFlaggedSession()">🚩 İşaretli ${flagged.length} kelimeye bak</button>`:"";
+      const knownBtn=known.length?`<button class="big-btn secondary" onclick="startKnownSession()">✓ Öğrendiklerimi tekrar et (${known.length})</button>`:"";
       area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">🎉</div><h3>Tüm kelimeleri tekrar ettin, tebrikler!</h3>
         ${chartHtml}
         <p>${flagged.length?"İşaretli kelimelerine bakmak ister misin?":"Bu kapsamda süresi gelen tekrar veya yeni kelime kalmadı."}</p>
         ${flaggedBtn}
+        ${knownBtn}
         <button class="big-btn secondary" onclick="startExtraSession()">Serbest pratik yap</button></div>`;
       return;
     }
@@ -1497,6 +1545,7 @@ function renderStudy(){
       buttons=`<p>${c.newAvail===Infinity?"Sınırsız":c.newAvail} yeni kelime seni bekliyor.</p><button class="big-btn" onclick="startSession('new')">Başla</button>`;
     }
     area.innerHTML=summaryHtml+`<div class="all-done"><div class="emoji">📖</div><h3>Çalışmaya hazır mısın?</h3>${chartHtml}${buttons}
+      ${knownWordsInScope().length?`<div style="margin-top:6px"><button class="chip" onclick="startKnownSession()">✓ Öğrendiklerimi tekrar et (${knownWordsInScope().length})</button></div>`:""}
       <p style="font-size:.78rem;color:var(--ink-faint);margin-top:10px">Oturum sen bitirene kadar devam eder — istediğin an "Oturumu bitir" diyebilirsin.</p></div>`;
     return;
   }
@@ -1585,19 +1634,87 @@ function sessionLiveStats(){
 function cardVariant(w){
   const p=prof().progress[w.id];
   const reps=p?p.reps:0;
-  // 1) Bu oturumda az önce Tekrar/Zor aldıysa → kolay format (reveal)
-  if(session.everStruggled&&session.everStruggled.has(w.id))return"reveal";
+  // 1) Bu oturumda Tekrar/Zor aldıysa → 5 şıklı boşluk doldurma ile pekiştir
+  //    (örneği boşluklanamıyorsa kolay format: reveal)
+  if(session.everStruggled&&session.everStruggled.has(w.id)){
+    return clozeOk(w)?"clozeChoice":"reveal";
+  }
   // 2) Cloze'da daha önce (herhangi bir gün) başarısız olduysa →
   //    kelime "öğrenildi" seviyesine ulaşana kadar cloze'a bir daha girmez
   if(p&&(p.clozeFails||0)>=1&&!isKnown(p))return"reveal";
   return(reps>=1&&clozeOk(w))?"cloze":"reveal";
+}
+/* ---- 5 şıklı seçenek üretici: 2 kolay + 1 orta + 1 zor çeldirici + doğru ---- */
+function buildChoiceOptions(w){
+  const pool=allWords().filter(x=>x.id!==w.id&&x.pos!=="kural");
+  const norm=x=>x.en.toLowerCase().trim();
+  const used=new Set([norm(w)]);
+  const take=arr=>{
+    arr=arr.filter(x=>!used.has(norm(x)));
+    if(!arr.length)return null;
+    const x=arr[Math.floor(Math.random()*arr.length)];
+    used.add(norm(x));return x;
+  };
+  const samePosCat=pool.filter(x=>x.pos===w.pos&&x.cat===w.cat);
+  const samePosOnly=pool.filter(x=>x.pos===w.pos&&x.cat!==w.cat);
+  const diffPos=pool.filter(x=>x.pos!==w.pos);
+  const opts=[{w,tier:"dogru"}];
+  const hard=take(samePosCat)||take(samePosOnly)||take(pool);
+  if(hard)opts.push({w:hard,tier:"zor"});
+  const med=take(samePosOnly)||take(samePosCat)||take(pool);
+  if(med)opts.push({w:med,tier:"orta"});
+  for(let i=0;i<2;i++){
+    const e=take(diffPos)||take(pool);
+    if(e)opts.push({w:e,tier:"kolay"});
+  }
+  while(opts.length<5){const f=take(pool);if(!f)break;opts.push({w:f,tier:"kolay"});}
+  return opts.sort(()=>Math.random()-.5);
+}
+function renderChoiceFront(w,st){
+  if(session.choiceFor!==w.id){
+    session.choiceFor=w.id;
+    session.choiceOpts=buildChoiceOptions(w);
+    session.choicePick=null;
+  }
+  const answered=session.choicePick!==null&&session.choicePick!==undefined;
+  let html=`<div class="flashcard">${cardHeaderHtml(w,st)}
+    <div class="cloze-prompt">${esc(clozeSentence(w))}</div>
+    <div class="choice-hint">Türkçesi: <b>${esc(w.tr)}</b> — boşluğa hangisi gelmeli?</div>
+    <div class="choice-list">`;
+  session.choiceOpts.forEach((o,i)=>{
+    let cls="choice-btn";
+    if(answered){
+      if(o.w.id===w.id)cls+=" correct";
+      else if(i===session.choicePick)cls+=" wrong";
+      else cls+=" dim";
+    }
+    const meta=answered?`<span class="choice-meta">${o.w.syn?esc(o.w.syn)+" · ":""}${esc(o.w.tr)}</span>`:"";
+    html+=`<button class="${cls}" ${answered?"disabled":""} onclick="event.stopPropagation();answerChoice(${i})"><span class="choice-en">${esc(o.w.en)}</span>${meta}</button>`;
+  });
+  html+=`</div>`;
+  if(answered){
+    const ex=currentExample(w);
+    html+=`<div class="choice-done-ex"><div>${esc(ex.en)}</div>${ex.tr?`<div class="tr">${esc(ex.tr)}</div>`:""}</div>`;
+  }
+  html+=`</div>`;
+  return html;
+}
+function answerChoice(i){
+  if(session.choicePick!==null&&session.choicePick!==undefined)return;
+  session.choicePick=i;
+  session.revealed=true;
+  renderCard();
 }
 function cardHeaderHtml(w,st){
   return`<span class="level-tag">${esc(w.level)} · ${esc(getCats()[w.cat]||w.cat)}${st==="new"?" · yeni":""}</span>
     <span class="pos-tag">${esc(w.pos||"")}</span>`;
 }
 function lapseFlagHtml(p){
-  return(p&&p.flagged)?`<span class="lapse-flag">🚩 işaretli (${p.weakCount||0}× zorlandın)</span>`:"";
+  if(!p||!p.flagged)return"";
+  const r=p.recovery||0;
+  return r>=3
+    ?`<span class="lapse-flag">🩹 iyileşiyor (${r}/5 doğru)</span>`
+    :`<span class="lapse-flag">🚩 işaretli · iyileşme ${r}/5</span>`;
 }
 function cardBackHtml(w){
   const ex=currentExample(w)||{en:"",tr:""};
@@ -1669,7 +1786,8 @@ function renderCard(){
     <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
       <button class="chip" onclick="finalizeSession('manual');renderStudy();">Oturumu bitir</button>
     </div>`;
-  if(variant==="cloze")html+=renderClozeFront(w,session.revealed,st,p);
+  if(variant==="clozeChoice")html+=renderChoiceFront(w,st);
+  else if(variant==="cloze")html+=renderClozeFront(w,session.revealed,st,p);
   else html+=renderRevealFront(w,session.revealed,st,p);
   if(session.revealed){
     html+=`<div class="grade-row">
@@ -1679,8 +1797,9 @@ function renderCard(){
       <button class="grade-btn easy" onclick="doGrade(4)">Kolay<span class="sub">${intervalPreview(w.id,4)}</span></button>
     </div>`;
   }
+  if(st!=="known")html+=`<div class="know-link-row"><button class="chip" onclick="markKnownInSession(${w.id})">✓ Bu kelimeyi zaten biliyorum</button></div>`;
   area.innerHTML=html;
-  if(!session.revealed){
+  if(!session.revealed&&variant!=="clozeChoice"){
     area.querySelector(".flashcard").addEventListener("click",e=>{
       if(e.target.closest(".speak-btn")||e.target.closest(".hint-btn"))return;
       session.revealed=true;renderCard();
@@ -1698,6 +1817,26 @@ function requeueWithinSession(w,minGap,maxGap){
   const offset=minGap+Math.floor(Math.random()*(maxGap-minGap+1));
   const insertAt=Math.min(session.queue.length,session.index+offset);
   session.queue.splice(insertAt,0,w);
+}
+function markAsKnown(id){
+  const p=getProg(id);
+  if(p.reps===0)p.firstDay=todayStr();
+  p.reps=Math.max(p.reps,3);
+  p.interval=Math.max(p.interval,45);
+  p.due=now()+p.interval*DAY;
+  p.flagged=false;p.weakCount=0;
+  prof().progress[id]=p;
+  saveState();
+}
+function markKnownInSession(id){
+  markAsKnown(id);
+  toast("✓ Öğrenildi olarak işaretlendi — 45 gün sonra kontrol amaçlı bir kez sorulacak");
+  if(session){
+    session.queue=session.queue.filter((x,i)=>!(x.id===id));
+    session.choiceFor=null;session.choicePick=null;session.revealed=false;
+    if(session.index>=session.queue.length){finalizeSession("complete");}
+  }
+  renderStudy();
 }
 function doGrade(g){
   const w=session.queue[session.index];
@@ -1719,6 +1858,7 @@ function doGrade(g){
   else if(g===2)requeueWithinSession(w,5,8);
   session.index++;session.revealed=false;
   session.typedCorrect=undefined;
+  session.choiceFor=null;session.choicePick=null;
   if(session.index>=session.queue.length)finalizeSession("complete");
   renderStudy();
 }
@@ -2096,7 +2236,8 @@ function renderWordList(){
         const chips=dups.map(d=>`<button class="chip" onclick="event.stopPropagation();gotoDuplicateLocation('${d.cat}','${jsq(w.en)}')">${esc(cats[d.cat]||d.cat)} → "${esc(d.tr)}"</button>`).join(" ");
         parts.push(`<div class="dup-locations">📁 Bu kelime başka klasörlerde de var: ${chips}</div>`);
       }
-      if(st==="stubborn")parts.push(`<button class="chip" style="margin-top:12px;margin-right:6px" onclick="event.stopPropagation();unflagWord(${w.id})">🚩 İşareti kaldır</button>`);
+      if(st==="stubborn"){const rp=(prof().progress[w.id]||{}).recovery||0;parts.push(`<button class="chip" style="margin-top:12px;margin-right:6px" onclick="event.stopPropagation();unflagWord(${w.id})">🚩 İşareti kaldır (iyileşme ${rp}/5)</button>`);}
+      if(st!=="known")parts.push(`<button class="chip" style="margin-top:12px;margin-right:6px" onclick="event.stopPropagation();markAsKnown(${w.id});toast('✓ Öğrenildi olarak işaretlendi');renderWordList()">✓ Zaten biliyorum</button>`);
       parts.push(`<button class="chip remove-btn" onclick="event.stopPropagation();removeWord(${w.id})">🗑️ Bu kelimeyi kaldır</button>`);
       detail=`<div class="wr-detail">${parts.join("")}</div>`;
     }
